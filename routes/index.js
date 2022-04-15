@@ -6,13 +6,16 @@ var cas = require('../lib/cas')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Home' });
+  res.render('index');
 });
 
-router.get('/app', cas.bounce, function(req, res, next) {
-  res.render('app', { title: 'App', cas_user: req.session[ cas.session_name ]});
-})
+router.get('/queue', function(req, res, next) {
+  res.render('queue');
+});
 
-router
+router.get('/cas_test', cas.bounce, function(req, res, next) {
+  //res.json(req.session[ cas.session_name])
+  res.json(req.session[ cas.session_info])
+});
 
 module.exports = router;
