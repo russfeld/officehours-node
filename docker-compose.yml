@@ -18,4 +18,4 @@ services:
     ports:
       - "8080:80"
     environment:
-      - PMA_ARBITRARY: 1
+      PMA_ARBITRARY: 1
