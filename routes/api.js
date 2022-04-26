@@ -30,10 +30,21 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/queues', function(req, res, next) {
-  db.table('queues')
+  if (req.session.is_admin) {
+    db.table('queues')
+    .select('id', 'name', 'description', db.raw('true AS helper'))
     .then(function(queues) {
       res.json(queues);
     });
+  } else {
+    db.table('queues')
+    .select('id', 'name', 'description', db.raw('IF(user_queues.user_id=' + req.session.user_id + ', true, false) AS helper'))
+    .leftJoin('user_queues', 'user_queues.queue_id', 'queues.id')
+    .then(function(queues) {
+      res.json(queues);
+    });
+  }
+
 })
 
 module.exports = router;
