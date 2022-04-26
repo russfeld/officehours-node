@@ -62,7 +62,7 @@ exports.up = function (knex) {
       table.string('name', 255).unique().notNullable()
       table.string('icon', 255)
     })
-    .createTable('sessions', function (table) {
+    .createTable('requests', function (table) {
       table.increments('id')
       table
         .integer('queue_id')
@@ -98,7 +98,7 @@ exports.up = function (knex) {
  */
 exports.down = function (knex) {
   return knex.schema
-    .dropTable('sessions')
+    .dropTable('requests')
     .dropTable('statuses')
     .dropTable('user_queues')
     .dropTable('queues')

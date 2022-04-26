@@ -16,12 +16,16 @@ var apiRouter = require('./routes/api')
 
 var app = express()
 
+// Session store
+var mysql_session = require('./configs/mysql_session')
+
 // Set up Session for CAS
 app.use(
   session({
     secret: process.env.APP_SECRET,
     resave: false,
     saveUninitialized: true,
+    store: mysql_session,
   })
 )
 
