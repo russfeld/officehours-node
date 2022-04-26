@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "nodemon ./bin/www",
     "start": "node ./bin/www",
-    "reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run"
+    "reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -21,6 +25,9 @@
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.6.2"
   }
 }
