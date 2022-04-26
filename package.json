@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "dev": "nodemon ./bin/www",
     "start": "node ./bin/www",
     "reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run"
   },
@@ -18,5 +19,8 @@
     "mysql": "^2.18.1",
     "node-cas-authentication": "^0.0.15",
     "pug": "2.0.0-beta11"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
