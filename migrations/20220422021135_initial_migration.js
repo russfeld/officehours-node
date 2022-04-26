@@ -14,7 +14,7 @@ exports.up = function(knex) {
     })
     .createTable('roles', function(table) {
         table.increments('id');
-        table.string('role_name', 255).unique().notNullable();
+        table.string('name', 255).unique().notNullable();
         table.timestamps();
     })
     .createTable('user_roles', function(table) {
@@ -36,6 +36,7 @@ exports.up = function(knex) {
     .createTable('statuses', function(table) {
         table.increments('id');
         table.string('name', 255).unique().notNullable();
+        table.string('icon', 255);
     })
     .createTable('sessions', function(table) {
         table.increments('id');
