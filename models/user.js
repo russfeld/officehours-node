@@ -1,4 +1,4 @@
-const { Model } = require('./base')
+const Model = require('./base')
 
 class User extends Model {
   // Table name is the only required property.

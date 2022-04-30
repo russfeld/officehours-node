@@ -9,9 +9,11 @@ router.get('/', function (req, res, next) {
   res.render('index')
 })
 
-router.get('/queue', function (req, res, next) {
-  res.render('queue')
+router.get('/app', function (req, res, next) {
+  res.render('app')
 })
+
+router.get( '/logout', cas.logout );
 
 router.get('/cas_test', cas.bounce, function (req, res, next) {
   //res.json(req.session[cas.session_name])
