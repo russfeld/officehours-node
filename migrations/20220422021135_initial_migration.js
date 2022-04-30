@@ -79,6 +79,7 @@ exports.up = function (knex) {
       table
         .integer('helper_id')
         .unsigned()
+        .nullable()
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')

@@ -23,12 +23,13 @@
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "node-cas-authentication": "^0.0.15",
+    "objection": "^3.0.1",
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
-    "nodemon": "^2.0.15",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "nodemon": "^2.0.15"
   }
 }
