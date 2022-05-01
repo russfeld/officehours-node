@@ -9,7 +9,8 @@
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "test": "mocha --timeout 5000 --exit"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -27,9 +28,13 @@
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
+    "mocha": "^10.0.0",
+    "nodemon": "^2.0.15",
     "prettier": "^2.6.2",
-    "nodemon": "^2.0.15"
+    "sinon": "^13.0.2"
   }
 }

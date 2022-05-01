@@ -7,6 +7,9 @@ var logger = require('morgan')
 // Session required for CAS
 var session = require('express-session')
 
+// Default Environment
+var environment = process.env.NODE_ENV || 'development';
+
 // Load Environment Variables
 require('dotenv').config()
 //console.log(process.env)
