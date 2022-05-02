@@ -10,6 +10,10 @@ class BaseModel extends Model {
   $beforeUpdate() {
     this.updated_at = new Date().toISOString()
   }
+
+  static get useLimitInFirst() {
+    return true
+  }
 }
 
 module.exports = BaseModel

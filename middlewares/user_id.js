@@ -1,18 +1,20 @@
 // Load CAS
 var cas = require('../configs/cas')
 
-// Load Database
-var db = require('../configs/db')
+// Load Model
+var User = require('../models/user')
 
-function user_id(req, res, next) {
+async function user_id(req, res, next) {
   if (req.session.user_id == undefined) {
-    db.table('users')
-      .where({ eid: req.session[cas.session_name] })
-      .first()
-      .then(function (user) {
-        req.session.user_id = user.id
-        next()
-      })
+    //Authenticated User
+    //console.log(req.session[cas.session_name])
+    var user = await User.query()
+      .where('eid', req.session[cas.session_name])
+      .limit(1)
+    req.session.user_id = user[0].id
+    //Authenticated Users's ID
+    //console.log(req.session.user_id)
+    next()
   } else {
     next()
   }
