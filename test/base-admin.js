@@ -11,20 +11,24 @@ require('chai').should()
 
 var app = require('../app')
 
+let db = require('../configs/db')
+
 let token
 
 chai.use(chaiHttp)
 //Our parent block
 describe('Base Admin', () => {
   beforeEach((done) => {
-    chai
-      .request(app)
-      .get('/login?eid=test-admin')
-      .end((err, res) => {
-        token = res.body.token
-        res.should.have.status(200)
-        done()
-      })
+    db.seed.run().then(() => {
+      chai
+        .request(app)
+        .get('/login?eid=test-admin')
+        .end((err, res) => {
+          token = res.body.token
+          res.should.have.status(200)
+          done()
+        })
+    })
   })
 
   afterEach((done) => {

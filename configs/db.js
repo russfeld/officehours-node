@@ -14,11 +14,4 @@ var db = Knex({
   },
 })
 
-/*
-db.migrate.latest()
-  .then(function() {
-    //return db.seed.run();
-  });
-*/
-
 module.exports = db
