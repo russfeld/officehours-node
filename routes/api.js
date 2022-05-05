@@ -1,14 +1,17 @@
-var express = require('express')
-var router = express.Router()
+// Load Libraries
+const express = require('express')
+const router = express.Router()
+const { raw } = require('objection')
 
-// Load Database
-var db = require('../configs/db')
+// Load Models
+//var db = require('../configs/db')
+const Queue = require('../models/queue')
 
 // Load Token Middleware
 var token = require('../middlewares/token')
 router.use(token)
 
-/* GET API Version. */
+/* GET API Version and User Details */
 router.get('/', function (req, res, next) {
   res.json({
     version: 1.0,
@@ -17,27 +20,26 @@ router.get('/', function (req, res, next) {
   })
 })
 
-router.get('/queues', function (req, res, next) {
+/* Get Queues List */
+router.get('/queues', async function (req, res, next) {
   if (req.is_admin) {
-    db.table('queues')
-      .select('id', 'name', 'description', db.raw('true AS helper'))
-      .then(function (queues) {
-        res.json(queues)
-      })
+    queues = await Queue.query().select(
+      'id',
+      'name',
+      'description',
+      raw('true AS helper')
+    )
+    res.json(queues)
   } else {
-    db.table('queues')
+    queues = await Queue.query()
       .select(
-        'id',
-        'name',
+        'queues.id',
+        'queues.name',
         'description',
-        db.raw(
-          'IF(user_queues.user_id=' + req.user_id + ', true, false) AS helper'
-        )
+        raw('IF(users_join.user_id=' + req.user_id + ', true, false) AS helper')
       )
-      .leftJoin('user_queues', 'user_queues.queue_id', 'queues.id')
-      .then(function (queues) {
-        res.json(queues)
-      })
+      .joinRelated('users')
+    res.json(queues)
   }
 })
 
