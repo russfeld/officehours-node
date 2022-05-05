@@ -1,28 +1,30 @@
-var createError = require('http-errors')
-var express = require('express')
-var path = require('path')
-var cookieParser = require('cookie-parser')
-var logger = require('morgan')
-
-// Session required for CAS
-var session = require('express-session')
+//Require Libraries
+const createError = require('http-errors')
+const express = require('express')
+const path = require('path')
+const cookieParser = require('cookie-parser')
+const logger = require('morgan')
+const session = require('express-session')
+const debug = require('debug')('app')
 
 // Default Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-// Load Environment Variables
+// Load Environment constiables
 require('dotenv').config()
-//console.log(process.env)
+debug('Environment:\n' + process.env)
 
-var indexRouter = require('./routes/index')
-var apiRouter = require('./routes/api')
+// Load Configs
+const mysql_session = require('./configs/mysql_session')
 
-var app = express()
+// Load Routers
+const indexRouter = require('./routes/index')
+const apiRouter = require('./routes/api')
 
-// Session store
-var mysql_session = require('./configs/mysql_session')
+// Create Express Application
+const app = express()
 
-// Set up Session for CAS
+// Set up MySQL Session
 app.use(
   session({
     secret: process.env.APP_SECRET,
@@ -32,25 +34,36 @@ app.use(
   })
 )
 
-// view engine setup
+// View engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 
-app.use(logger('dev'))
+// Configure Logging
+// https://stackoverflow.com/questions/60129677/how-to-disable-morgan-request-logger-during-unit-test
+app.use(logger('dev', { skip: () => process.env.NODE_ENV === 'test' }))
+
+// JSON Middleware
 app.use(express.json())
+
+// Handle URLEncoded Bodies
 app.use(express.urlencoded({ extended: false }))
+
+// Parse Cookies
 app.use(cookieParser())
+
+// Serve Static Resources
 app.use(express.static(path.join(__dirname, 'public')))
 
+// Routers
 app.use('/', indexRouter)
 app.use('/api/v1', apiRouter)
 
-// catch 404 and forward to error handler
+// Catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404))
 })
 
-// error handler
+// Error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message
