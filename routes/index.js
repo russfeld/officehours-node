@@ -37,33 +37,66 @@ router.get('/login', async function (req, res, next) {
       // use CAS authentication
       if (req.session[cas.session_name] === undefined) {
         cas.bounce_redirect(req, res, next)
-        return
+        //return
+        //res.status(401)
       } else {
         eid = req.session[cas.session_name]
       }
     }
     if (eid && eid.length != 0) {
-      let user = await User.query().where('eid', eid).limit(1)
-      // user not found - create user
-      if (user.length === 0) {
-        user = await User.query().insert({
-          eid: eid,
-          name: eid,
-        })
-      }
+      let user = await User.findOrCreate(eid)
+      // let user = await User.query().where('eid', eid).limit(1)
+      // // user not found - create user
+      // if (user.length === 0) {
+      //   user = await User.query().insert({
+      //     eid: eid,
+      //     name: eid,
+      //   })
+      // }
       req.session.user_id = user[0].id
     }
   }
-  res.json({
-    token: jwt.sign(
-      { user_id: req.session.user_id },
-      process.env.TOKEN_SECRET,
-      {
-        expiresIn: '3h',
-      }
-    ),
-  })
-  //res.redirect('/')
+  // res.json({
+  //   token: jwt.sign(
+  //     { user_id: req.session.user_id },
+  //     process.env.TOKEN_SECRET,
+  //     {
+  //       expiresIn: '3h',
+  //     }
+  //   ),
+  // })
+  res.redirect('/')
+})
+
+router.get('/token', function (req, res, next) {
+  if (req.session.user_id) {
+    res.json({
+      token: jwt.sign(
+        { user_id: req.session.user_id },
+        process.env.TOKEN_SECRET,
+        {
+          expiresIn: '3h',
+        }
+      ),
+    })
+  } else {
+    res.status(401)
+    res.send()
+  }
+})
+
+router.get('/cas_login', async function (req, res, next) {
+  if (req.session[cas.session_name] === undefined) {
+    cas.bounce_redirect(req, res, next)
+    return
+  } else {
+    let eid = req.session[cas.session_name]
+    if (eid && eid.length != 0) {
+      let user = await User.findOrCreate(eid)
+      req.session.user_id = user[0].id
+    }
+  }
+  res.redirect('/')
 })
 
 router.get('/logout', function (req, res, next) {
@@ -71,8 +104,8 @@ router.get('/logout', function (req, res, next) {
     cas.logout(req, res, next)
   } else {
     req.session.destroy()
+    res.redirect('/')
   }
-  res.redirect('/')
 })
 
 // router.get('/token', function (req, res, next) {

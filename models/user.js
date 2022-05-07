@@ -20,6 +20,17 @@ class User extends Model {
   //fullName() {
   //  return this.firstName + ' ' + this.lastName;
   //}
+  static async findOrCreate(eid) {
+    let user = await User.query().where('eid', eid).limit(1)
+    // user not found - create user
+    if (user.length === 0) {
+      user = await User.query().insert({
+        eid: eid,
+        name: eid,
+      })
+    }
+    return user
+  }
 
   // Optional JSON schema. This is not the database schema!
   // No tables or columns are generated based on this. This is only

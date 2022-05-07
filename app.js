@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const session = require('express-session')
 const debug = require('debug')('app')
+const cors = require('cors')
 
 // Default Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -33,6 +34,16 @@ app.use(
     store: mysql_session,
   })
 )
+
+// Enable CORS in development
+if (process.env.NODE_ENV === 'development') {
+  app.use(
+    cors({
+      origin: 'http://localhost:3001',
+      credentials: true,
+    })
+  )
+}
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'))

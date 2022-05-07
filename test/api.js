@@ -25,31 +25,35 @@ describe('API Tests', function () {
     })
   })
 
-  // After each test
-  afterEach(function (done) {
-    // Logout
-    chai
-      .request(app)
-      .get('/logout')
-      .redirects(0)
-      .end((err, res) => {
-        res.should.have.status(302)
-        done()
-      })
-  })
+  // // After each test
+  // afterEach(function (done) {
+  //   // Logout
+  //   chai
+  //     .request(app)
+  //     .get('/logout')
+  //     .redirects(0)
+  //     .end((err, res) => {
+  //       res.should.have.status(302)
+  //       done()
+  //     })
+  // })
 
   // Admin User Tests
   describe('Admin User Tests', function () {
     // Before each admin test
     beforeEach(function (done) {
       // Login as an administrator account
-      chai
-        .request(app)
+      var agent = chai.request.agent(app)
+      agent
+        //.request(app)
         .get('/login?eid=test-admin')
-        .end((err, res) => {
-          token = res.body.token
-          res.should.have.status(200)
-          done()
+        .end(() => {
+          agent.get('/token').end((err, res) => {
+            token = res.body.token
+            res.should.have.status(200)
+            agent.close()
+            done()
+          })
         })
     })
 
@@ -184,13 +188,17 @@ describe('API Tests', function () {
     // Before each student test
     beforeEach(function (done) {
       // Login as a student account
-      chai
-        .request(app)
+      var agent = chai.request.agent(app)
+      agent
+        //.request(app)
         .get('/login?eid=test-student-1')
-        .end((err, res) => {
-          token = res.body.token
-          res.should.have.status(200)
-          done()
+        .end(() => {
+          agent.get('/token').end((err, res) => {
+            token = res.body.token
+            res.should.have.status(200)
+            agent.close()
+            done()
+          })
         })
     })
 

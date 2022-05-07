@@ -23,7 +23,7 @@ router.get('/', function (req, res, next) {
 /* Get Queues List */
 router.get('/queues', async function (req, res, next) {
   if (req.is_admin) {
-    queues = await Queue.query().select(
+    let queues = await Queue.query().select(
       'id',
       'name',
       'description',
@@ -31,7 +31,7 @@ router.get('/queues', async function (req, res, next) {
     )
     res.json(queues)
   } else {
-    queues = await Queue.query()
+    let queues = await Queue.query()
       .select(
         'queues.id',
         'queues.name',
