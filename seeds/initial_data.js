@@ -73,6 +73,8 @@ exports.seed = async function (knex) {
     {
       id: 1,
       name: 'Queue 1',
+      snippet:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan.',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan. Aenean sed ornare neque. Duis eget mi vitae eros porttitor vehicula nec eu erat. Proin convallis molestie orci eu interdum. In luctus tincidunt elit sit amet condimentum. Nunc quis velit lorem. Morbi eleifend tempus auctor. Sed posuere elementum dui a semper. Quisque non risus at libero porttitor venenatis aliquam ut ante. Nunc mauris dolor, mattis id diam nec, euismod efficitur mauris.',
       created_at: '2022-01-01T00:00:00',
@@ -81,6 +83,8 @@ exports.seed = async function (knex) {
     {
       id: 2,
       name: 'Queue 2',
+      snippet:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan.',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan. Aenean sed ornare neque. Duis eget mi vitae eros porttitor vehicula nec eu erat. Proin convallis molestie orci eu interdum. In luctus tincidunt elit sit amet condimentum. Nunc quis velit lorem. Morbi eleifend tempus auctor. Sed posuere elementum dui a semper. Quisque non risus at libero porttitor venenatis aliquam ut ante. Nunc mauris dolor, mattis id diam nec, euismod efficitur mauris.',
       created_at: '2022-01-01T00:00:00',
@@ -89,6 +93,8 @@ exports.seed = async function (knex) {
     {
       id: 3,
       name: 'Queue 3',
+      snippet:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan.',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan. Aenean sed ornare neque. Duis eget mi vitae eros porttitor vehicula nec eu erat. Proin convallis molestie orci eu interdum. In luctus tincidunt elit sit amet condimentum. Nunc quis velit lorem. Morbi eleifend tempus auctor. Sed posuere elementum dui a semper. Quisque non risus at libero porttitor venenatis aliquam ut ante. Nunc mauris dolor, mattis id diam nec, euismod efficitur mauris.',
       created_at: '2022-01-01T00:00:00',

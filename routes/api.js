@@ -26,6 +26,7 @@ router.get('/queues', async function (req, res, next) {
     let queues = await Queue.query().select(
       'id',
       'name',
+      'snippet',
       'description',
       raw('true AS helper')
     )
@@ -35,6 +36,7 @@ router.get('/queues', async function (req, res, next) {
       .select(
         'queues.id',
         'queues.name',
+        'snippet',
         'description',
         raw('IF(users_join.user_id=' + req.user_id + ', true, false) AS helper')
       )

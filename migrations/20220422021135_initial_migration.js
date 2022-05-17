@@ -37,6 +37,7 @@ exports.up = function (knex) {
     .createTable('queues', function (table) {
       table.increments('id')
       table.string('name', 255).unique().notNullable()
+      table.text('snippet')
       table.text('description')
       table.timestamps()
     })
