@@ -10,6 +10,7 @@ exports.up = function (knex) {
       table.string('name', 255).notNullable()
       table.text('contact_info')
       table.string('image', 255)
+      table.string('refresh_token', 255)
       table.timestamps()
     })
     .createTable('roles', function (table) {

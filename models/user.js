@@ -24,12 +24,22 @@ class User extends Model {
     let user = await User.query().where('eid', eid).limit(1)
     // user not found - create user
     if (user.length === 0) {
-      user = await User.query().insert({
-        eid: eid,
-        name: eid,
-      })
+      user = [
+        await User.query().insert({
+          eid: eid,
+          name: eid,
+        }),
+      ]
     }
-    return user
+    return user[0]
+  }
+
+  static async findByRefreshToken(token) {
+    let user = await User.query().where('refresh_token', token).limit(1)
+    if (user.length === 0) {
+      return null
+    }
+    return user[0]
   }
 
   // Optional JSON schema. This is not the database schema!
