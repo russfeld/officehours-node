@@ -1,5 +1,4 @@
 // const { useColors } = require('debug/src/browser')
-const crypto = require('crypto')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
@@ -71,15 +70,12 @@ router.get('/login', async function (req, res, next) {
 
 router.get('/token', async function (req, res, next) {
   if (req.session.user_id) {
-    const token = crypto.randomBytes(32).toString('hex')
-    await User.query().findById(req.session.user_id).patch({
-      refresh_token: token,
-    })
+    const refresh_token = await User.updateRefreshToken(req.session.user_id)
     res.json({
       token: jwt.sign(
         {
           user_id: req.session.user_id,
-          refresh_token: token,
+          refresh_token: refresh_token,
         },
         process.env.TOKEN_SECRET,
         {
@@ -88,38 +84,41 @@ router.get('/token', async function (req, res, next) {
       ),
     })
   } else {
-    res.status(401)
-    res.send()
+    res.sendStatus(401)
   }
 })
 
 router.post('/token', async function (req, res, next) {
   if (req.body.refresh_token) {
-    const user = await User.findByRefreshToken(req.body.refresh_token)
-    if (user != null) {
-      const token = crypto.randomBytes(32).toString('hex')
-      await User.query().findById(user.id).patch({
-        refresh_token: token,
-      })
-      res.json({
-        token: jwt.sign(
-          {
-            user_id: user.id,
-            refresh_token: token,
-          },
-          process.env.TOKEN_SECRET,
-          {
-            expiresIn: '30m',
-          }
-        ),
-      })
-    } else {
-      res.status(401)
-      res.send()
-    }
+    jwt.verify(
+      req.body.refresh_token,
+      process.env.TOKEN_SECRET,
+      async (err, data) => {
+        if (err) {
+          res.sendStatus(401)
+        }
+        const user = await User.findByRefreshToken(data.refresh_token)
+        if (user != null) {
+          const refresh_token = await User.updateRefreshToken(user.id)
+          res.json({
+            token: jwt.sign(
+              {
+                user_id: req.session.user_id,
+                refresh_token: refresh_token,
+              },
+              process.env.TOKEN_SECRET,
+              {
+                expiresIn: '30m',
+              }
+            ),
+          })
+        } else {
+          res.sendStatus(401)
+        }
+      }
+    )
   } else {
-    res.status(401)
-    res.send()
+    res.sendStatus(401)
   }
 })
 

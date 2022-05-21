@@ -1,4 +1,6 @@
 const Model = require('./base')
+const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 
 class User extends Model {
   // Table name is the only required property.
@@ -40,6 +42,24 @@ class User extends Model {
       return null
     }
     return user[0]
+  }
+
+  static async updateRefreshToken(id) {
+    const token = crypto.randomBytes(32).toString('hex')
+    await User.query().findById(id).patch({
+      refresh_token: token,
+    })
+    const refresh_token = jwt.sign(
+      {
+        user_id: id,
+        refresh_token: token,
+      },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: '6h',
+      }
+    )
+    return refresh_token
   }
 
   // Optional JSON schema. This is not the database schema!
