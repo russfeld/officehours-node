@@ -51,7 +51,6 @@ class User extends Model {
     })
     const refresh_token = jwt.sign(
       {
-        user_id: id,
         refresh_token: token,
       },
       process.env.TOKEN_SECRET,
