@@ -13,7 +13,13 @@ async function authenticateToken(req, res, next) {
   jwt.verify(token, process.env.TOKEN_SECRET, async (err, user) => {
     // console.log(err)
 
-    if (err) return res.sendStatus(403)
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.sendStatus(401)
+      } else {
+        return res.sendStatus(403)
+      }
+    }
 
     req.user_id = user.user_id
 

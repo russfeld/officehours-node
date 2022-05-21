@@ -61,6 +61,27 @@ class User extends Model {
     return refresh_token
   }
 
+  static async getToken(id) {
+    const refresh_token = await User.updateRefreshToken(id)
+    const token = jwt.sign(
+      {
+        user_id: id,
+        refresh_token: refresh_token,
+      },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: '30m',
+      }
+    )
+    return token
+  }
+
+  static async clearRefreshToken(id) {
+    await User.query().findById(id).patch({
+      refresh_token: null,
+    })
+  }
+
   // Optional JSON schema. This is not the database schema!
   // No tables or columns are generated based on this. This is only
   // used for input validation. Whenever a model instance is created

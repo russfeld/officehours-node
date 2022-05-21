@@ -70,18 +70,9 @@ router.get('/login', async function (req, res, next) {
 
 router.get('/token', async function (req, res, next) {
   if (req.session.user_id) {
-    const refresh_token = await User.updateRefreshToken(req.session.user_id)
+    const token = await User.getToken(req.session.user_id)
     res.json({
-      token: jwt.sign(
-        {
-          user_id: req.session.user_id,
-          refresh_token: refresh_token,
-        },
-        process.env.TOKEN_SECRET,
-        {
-          expiresIn: '30m',
-        }
-      ),
+      token: token,
     })
   } else {
     res.sendStatus(401)
@@ -99,18 +90,9 @@ router.post('/token', async function (req, res, next) {
         }
         const user = await User.findByRefreshToken(data.refresh_token)
         if (user != null) {
-          const refresh_token = await User.updateRefreshToken(user.id)
+          const token = await User.getToken(user.id)
           res.json({
-            token: jwt.sign(
-              {
-                user_id: req.session.user_id,
-                refresh_token: refresh_token,
-              },
-              process.env.TOKEN_SECRET,
-              {
-                expiresIn: '30m',
-              }
-            ),
+            token: token,
           })
         } else {
           res.sendStatus(401)
@@ -136,7 +118,10 @@ router.get('/cas_login', async function (req, res, next) {
   res.redirect('/')
 })
 
-router.get('/logout', function (req, res, next) {
+router.get('/logout', async function (req, res, next) {
+  if (req.session.user_id) {
+    await User.clearRefreshToken(req.session.user_id)
+  }
   if (req.session[cas.session_name]) {
     cas.logout(req, res, next)
   } else {
