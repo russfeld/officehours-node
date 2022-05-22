@@ -28,7 +28,8 @@ router.get('/queues', async function (req, res, next) {
       'name',
       'snippet',
       'description',
-      raw('true AS helper')
+      raw('true AS helper'),
+      raw('true AS editable')
     )
     res.json(queues)
   } else {
@@ -38,10 +39,31 @@ router.get('/queues', async function (req, res, next) {
         'queues.name',
         'snippet',
         'description',
-        raw('IF(users_join.user_id=' + req.user_id + ', true, false) AS helper')
+        raw(
+          'IF(users_join.user_id=' + req.user_id + ', true, false) AS helper'
+        ),
+        raw('false AS editable')
       )
       .joinRelated('users')
     res.json(queues)
+  }
+})
+
+router.post('/queues/:id/edit', async function (req, res, next) {
+  if (req.is_admin) {
+    try {
+      await Queue.query().findById(req.params.id).patch({
+        name: req.body.queue.name,
+        snippet: req.body.queue.snippet,
+        description: req.body.queue.description,
+      })
+      res.sendStatus(204)
+    } catch (error) {
+      res.status(422)
+      res.json(error)
+    }
+  } else {
+    res.sendStatus(403)
   }
 })
 

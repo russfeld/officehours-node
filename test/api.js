@@ -180,7 +180,42 @@ describe('API Tests', function () {
             done()
           })
       })
+
+      it('should return all queues as editable', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/queues/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(200)
+            res.body.should.be.a('array')
+            res.body
+              .find((queue) => {
+                return queue.id === 1
+              })
+              .should.have.property('editable')
+              .eql(1)
+            res.body
+              .find((queue) => {
+                return queue.id === 2
+              })
+              .should.have.property('editable')
+              .eql(1)
+            res.body
+              .find((queue) => {
+                return queue.id === 3
+              })
+              .should.have.property('editable')
+              .eql(1)
+            done()
+          })
+      })
     }) // end GET /api/v1/queues
+
+    describe('POST /api/v1/queues/1/edit', function () {
+      it('should edit queue data')
+      it('should reject invalid data')
+    })
   }) // end admin user tests
 
   // Student User Tests
@@ -325,6 +360,40 @@ describe('API Tests', function () {
             done()
           })
       })
+
+      it('should return no queues as editable', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/queues/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(200)
+            res.body.should.be.a('array')
+            res.body
+              .find((queue) => {
+                return queue.id === 1
+              })
+              .should.have.property('editable')
+              .eql(0)
+            res.body
+              .find((queue) => {
+                return queue.id === 2
+              })
+              .should.have.property('editable')
+              .eql(0)
+            res.body
+              .find((queue) => {
+                return queue.id === 3
+              })
+              .should.have.property('editable')
+              .eql(0)
+            done()
+          })
+      })
     }) // end GET /api/v1/queues
+
+    describe('POST /api/v1/queues/1/edit', function () {
+      it('should not allow editing')
+    })
   }) // end student user tests
 })
