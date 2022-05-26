@@ -22,17 +22,16 @@ exports.up = function (knex) {
       table
         .integer('user_id')
         .unsigned()
-        .primary()
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
       table
         .integer('role_id')
         .unsigned()
-        .primary()
         .references('id')
         .inTable('roles')
         .onDelete('CASCADE')
+      table.primary(['user_id', 'role_id'])
       table.timestamps()
     })
     .createTable('queues', function (table) {
@@ -46,17 +45,16 @@ exports.up = function (knex) {
       table
         .integer('user_id')
         .unsigned()
-        .primary()
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
       table
         .integer('queue_id')
         .unsigned()
-        .primary()
         .references('id')
         .inTable('queues')
         .onDelete('CASCADE')
+      table.primary(['user_id', 'queue_id'])
       table.timestamps()
     })
     .createTable('statuses', function (table) {
