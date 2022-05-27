@@ -63,9 +63,11 @@ class User extends Model {
 
   static async getToken(id) {
     const refresh_token = await User.updateRefreshToken(id)
+    let user = await User.query().findById(id)
     const token = jwt.sign(
       {
         user_id: id,
+        eid: user.eid,
         refresh_token: refresh_token,
       },
       process.env.TOKEN_SECRET,

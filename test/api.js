@@ -212,11 +212,11 @@ describe('API Tests', function () {
       })
     }) // end GET /api/v1/queues
 
-    describe('POST /api/v1/queues/1/edit', function () {
+    describe('POST /api/v1/queues/1', function () {
       it('should edit queue data', function (done) {
         chai
           .request(app)
-          .post('/api/v1/queues/1/edit')
+          .post('/api/v1/queues/1')
           .type('json')
           .send({
             queue: {
@@ -261,7 +261,7 @@ describe('API Tests', function () {
       it('should remove a helper', function (done) {
         chai
           .request(app)
-          .post('/api/v1/queues/1/edit')
+          .post('/api/v1/queues/1')
           .type('json')
           .send({
             queue: {
@@ -307,7 +307,7 @@ describe('API Tests', function () {
       it('should add a helper', function (done) {
         chai
           .request(app)
-          .post('/api/v1/queues/3/edit')
+          .post('/api/v1/queues/3')
           .type('json')
           .send({
             queue: {
@@ -353,7 +353,7 @@ describe('API Tests', function () {
       it('should change helpers', function (done) {
         chai
           .request(app)
-          .post('/api/v1/queues/3/edit')
+          .post('/api/v1/queues/3')
           .type('json')
           .send({
             queue: {
@@ -396,7 +396,7 @@ describe('API Tests', function () {
       it('should reject invalid data', function (done) {
         chai
           .request(app)
-          .post('/api/v1/queues/1/edit')
+          .post('/api/v1/queues/1')
           .type('json')
           .send({
             queue: {
@@ -482,6 +482,13 @@ describe('API Tests', function () {
             done()
           })
       })
+    })
+
+    describe('GET /api/v1/user', function () {
+      it('should return user data')
+    })
+    describe('POST /api/v1/user', function () {
+      it('should update user data')
     })
   }) // end admin user tests
 
@@ -659,11 +666,11 @@ describe('API Tests', function () {
       })
     }) // end GET /api/v1/queues
 
-    describe('POST /api/v1/queues/1/edit', function () {
+    describe('POST /api/v1/queues/1', function () {
       it('should not allow editing', function (done) {
         chai
           .request(app)
-          .post('/api/v1/queues/1/edit')
+          .post('/api/v1/queues/1')
           .type('json')
           .send({
             queue: {
@@ -702,6 +709,10 @@ describe('API Tests', function () {
             done()
           })
       })
+    })
+
+    describe('GET /api/v1/user', function () {
+      it('should return user data')
     })
   }) // end student 1 user tests
 
@@ -770,6 +781,10 @@ describe('API Tests', function () {
           })
       })
     }) // end GET /api/v1/queues
+
+    describe('GET /api/v1/user', function () {
+      it('should return user data')
+    })
   }) // end student 2 tests
 
   // Student User Tests
@@ -837,5 +852,9 @@ describe('API Tests', function () {
           })
       })
     }) // end GET /api/v1/queues
+
+    describe('GET /api/v1/user', function () {
+      it('should return user data')
+    })
   }) // end student 2 tests
 })

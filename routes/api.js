@@ -63,7 +63,7 @@ router.get('/queues', async function (req, res, next) {
   }
 })
 
-router.post('/queues/:id/edit', async function (req, res, next) {
+router.post('/queues/:id', async function (req, res, next) {
   if (req.is_admin) {
     try {
       // strip out other data from users
@@ -102,6 +102,24 @@ router.get('/users', async function (req, res, next) {
     res.json(users)
   } else {
     res.sendStatus(403)
+  }
+})
+
+router.get('/user', async function (req, res, next) {
+  let user = await User.query().findById(req.user_id)
+  res.json(user)
+})
+
+router.post('/user', async function (req, res, next) {
+  try {
+    await User.query().findById(req.user_id).patch({
+      name: req.body.user.name,
+      contact_info: req.body.user.contact_info,
+    })
+    res.sendStatus(204)
+  } catch (error) {
+    res.status(422)
+    res.json(error)
   }
 })
 
