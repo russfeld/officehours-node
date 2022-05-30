@@ -98,7 +98,12 @@ router.post('/queues/:id', async function (req, res, next) {
 /* Get Users List */
 router.get('/users', async function (req, res, next) {
   if (req.is_admin) {
-    let users = await User.query().select('id', 'eid', 'name')
+    let users = await User.query()
+      .select('users.id', 'users.eid', 'users.name')
+      .withGraphJoined('roles')
+      .modifyGraph('roles', (builder) => {
+        builder.select('roles.id', 'roles.name')
+      })
     res.json(users)
   } else {
     res.sendStatus(403)

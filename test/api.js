@@ -441,6 +441,12 @@ describe('API Tests', function () {
             res.should.have.status(200)
             res.body.should.be.a('array')
             res.body.map(({ id }) => ({ id })).should.deep.include({ id: 1 })
+            const user = res.body.find((user) => {
+              return user.id === 1
+            })
+            user.roles.should.be.a('array')
+            user.roles.should.have.a.lengthOf(1)
+            user.roles[0].name.should.eql('admin')
             done()
           })
       })
