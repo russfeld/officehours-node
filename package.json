@@ -7,9 +7,9 @@
     "start": "node ./bin/www",
     "reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run",
     "format:check": "prettier --check .",
-    "format:write": "prettier --write .",
+    "format": "prettier --write .",
     "lint:check": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint": "eslint --fix .",
     "test": "mocha --timeout 10000 --exit"
   },
   "dependencies": {

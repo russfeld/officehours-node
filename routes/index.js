@@ -85,15 +85,23 @@ router.post('/token', async function (req, res, next) {
       req.body.refresh_token,
       process.env.TOKEN_SECRET,
       async (err, data) => {
+        console.log('Debugging old refresh tokens')
+        console.log(err)
+        console.log(data)
         if (err) {
           res.sendStatus(401)
         }
-        const user = await User.findByRefreshToken(data.refresh_token)
-        if (user != null) {
-          const token = await User.getToken(user.id)
-          res.json({
-            token: token,
-          })
+
+        if (data.refresh_token) {
+          const user = await User.findByRefreshToken(data.refresh_token)
+          if (user != null) {
+            const token = await User.getToken(user.id)
+            res.json({
+              token: token,
+            })
+          } else {
+            res.sendStatus(401)
+          }
         } else {
           res.sendStatus(401)
         }

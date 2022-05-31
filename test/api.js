@@ -5,6 +5,7 @@ process.env.FORCE_AUTH = 'true'
 //Require the dev-dependencies
 const chai = require('chai')
 const chaiHttp = require('chai-http')
+// const { redirect } = require('express/lib/response')
 chai.use(chaiHttp)
 require('chai').should()
 
@@ -415,6 +416,7 @@ describe('API Tests', function () {
             done()
           })
       })
+      it('should reject bad queue id')
     })
 
     describe('GET /api/v1/users', function () {
@@ -440,6 +442,12 @@ describe('API Tests', function () {
             res.should.have.status(200)
             res.body.should.be.a('array')
             res.body.map(({ id }) => ({ id })).should.deep.include({ id: 1 })
+            const user = res.body.find((user) => {
+              return user.id === 1
+            })
+            user.roles.should.be.a('array')
+            user.roles.should.have.a.lengthOf(1)
+            user.roles[0].name.should.eql('admin')
             done()
           })
       })
@@ -484,11 +492,72 @@ describe('API Tests', function () {
       })
     })
 
+    describe('POST /api/v1/users', function () {
+      it('should update user data')
+      it('should reject bad user data')
+      it('should reject bad user id')
+      it('should update user roles')
+    })
+
+    describe('DELETE /api/v1/users', function () {
+      it('should delete user')
+      it('should reject bad user id')
+      it('should not allow delete self')
+    })
+
     describe('GET /api/v1/user', function () {
-      it('should return user data')
+      it('should return user data', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/user/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.has.status(200)
+            res.body.should.be.a('object')
+            res.body.should.have.property('id').eql(1)
+            res.body.should.have.property('eid').eql('test-admin')
+            res.body.should.have.property('name').eql('Test Administrator')
+            done()
+          })
+      })
     })
     describe('POST /api/v1/user', function () {
-      it('should update user data')
+      it('should update user data', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/user/')
+          .type('json')
+          .send({
+            user: {
+              eid: 'changed-eid', // cannot change
+              name: 'New Name',
+              contact_info: 'New Contact Info',
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/user/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.has.status(200)
+                res.body.should.be.a('object')
+                res.body.should.have.property('id').eql(1)
+                res.body.should.have.property('eid').eql('test-admin')
+                res.body.should.have.property('name').eql('New Name')
+                res.body.should.have
+                  .property('contact_info')
+                  .eql('New Contact Info')
+                done()
+              })
+          })
+      })
+    })
+
+    describe('GET /api/v1/roles', function () {
+      it('should get roles')
     })
   }) // end admin user tests
 
@@ -711,8 +780,67 @@ describe('API Tests', function () {
       })
     })
 
+    describe('POST /api/v1/users', function () {
+      it('should not allow updates')
+    })
+
+    describe('DELETE /api/v1/users', function () {
+      it('should not allow deletes')
+    })
+
     describe('GET /api/v1/user', function () {
-      it('should return user data')
+      it('should return user data', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/user/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.has.status(200)
+            res.body.should.be.a('object')
+            res.body.should.have.property('id').eql(2)
+            res.body.should.have.property('eid').eql('test-student-1')
+            res.body.should.have.property('name').eql('Test Student 1')
+            done()
+          })
+      })
+    })
+    describe('POST /api/v1/user', function () {
+      it('should update user data', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/user/')
+          .type('json')
+          .send({
+            user: {
+              eid: 'changed-eid', // cannot change
+              name: 'New Name',
+              contact_info: 'New Contact Info',
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/user/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.has.status(200)
+                res.body.should.be.a('object')
+                res.body.should.have.property('id').eql(2)
+                res.body.should.have.property('eid').eql('test-student-1')
+                res.body.should.have.property('name').eql('New Name')
+                res.body.should.have
+                  .property('contact_info')
+                  .eql('New Contact Info')
+                done()
+              })
+          })
+      })
+    })
+
+    describe('GET /api/v1/roles', function () {
+      it('should not get roles')
     })
   }) // end student 1 user tests
 
@@ -783,7 +911,54 @@ describe('API Tests', function () {
     }) // end GET /api/v1/queues
 
     describe('GET /api/v1/user', function () {
-      it('should return user data')
+      it('should return user data', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/user/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.has.status(200)
+            res.body.should.be.a('object')
+            res.body.should.have.property('id').eql(3)
+            res.body.should.have.property('eid').eql('test-student-2')
+            res.body.should.have.property('name').eql('Test Student 2')
+            done()
+          })
+      })
+    })
+    describe('POST /api/v1/user', function () {
+      it('should update user data', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/user/')
+          .type('json')
+          .send({
+            user: {
+              eid: 'changed-eid', // cannot change
+              name: 'New Name',
+              contact_info: 'New Contact Info',
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/user/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.has.status(200)
+                res.body.should.be.a('object')
+                res.body.should.have.property('id').eql(3)
+                res.body.should.have.property('eid').eql('test-student-2')
+                res.body.should.have.property('name').eql('New Name')
+                res.body.should.have
+                  .property('contact_info')
+                  .eql('New Contact Info')
+                done()
+              })
+          })
+      })
     })
   }) // end student 2 tests
 
@@ -854,7 +1029,54 @@ describe('API Tests', function () {
     }) // end GET /api/v1/queues
 
     describe('GET /api/v1/user', function () {
-      it('should return user data')
+      it('should return user data', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/user/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.has.status(200)
+            res.body.should.be.a('object')
+            res.body.should.have.property('id').eql(4)
+            res.body.should.have.property('eid').eql('test-student-3')
+            res.body.should.have.property('name').eql('Test Student 3')
+            done()
+          })
+      })
+    })
+    describe('POST /api/v1/user', function () {
+      it('should update user data', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/user/')
+          .type('json')
+          .send({
+            user: {
+              eid: 'changed-eid', // cannot change
+              name: 'New Name',
+              contact_info: 'New Contact Info',
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/user/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.has.status(200)
+                res.body.should.be.a('object')
+                res.body.should.have.property('id').eql(4)
+                res.body.should.have.property('eid').eql('test-student-3')
+                res.body.should.have.property('name').eql('New Name')
+                res.body.should.have
+                  .property('contact_info')
+                  .eql('New Contact Info')
+                done()
+              })
+          })
+      })
     })
   }) // end student 2 tests
 })

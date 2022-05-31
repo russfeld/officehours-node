@@ -44,9 +44,9 @@ class User extends Model {
     return user[0]
   }
 
-  static async updateRefreshToken(id) {
+  async updateRefreshToken() {
     const token = crypto.randomBytes(32).toString('hex')
-    await User.query().findById(id).patch({
+    await this.$query().patch({
       refresh_token: token,
     })
     const refresh_token = jwt.sign(
@@ -61,13 +61,23 @@ class User extends Model {
     return refresh_token
   }
 
+  async is_admin() {
+    const roles = await this.$relatedQuery('roles').for(this.id).select('name')
+    //Roles for current user
+    //console.log(roles)
+    return roles.some((r) => r.name === 'admin')
+  }
+
   static async getToken(id) {
-    const refresh_token = await User.updateRefreshToken(id)
+    //const refresh_token = await User.updateRefreshToken(id)
     let user = await User.query().findById(id)
+    const refresh_token = await user.updateRefreshToken()
+    const is_admin = await user.is_admin()
     const token = jwt.sign(
       {
         user_id: id,
         eid: user.eid,
+        is_admin: is_admin,
         refresh_token: refresh_token,
       },
       process.env.TOKEN_SECRET,
