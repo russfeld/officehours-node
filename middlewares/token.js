@@ -29,6 +29,7 @@ async function authenticateToken(req, res, next) {
       .select('name')
     //Roles for current user
     //console.log(roles)
+    //TODO Replace with token? One less DB call?
     if (roles.some((r) => r.name === 'admin')) {
       req.is_admin = true
     } else {

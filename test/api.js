@@ -416,6 +416,7 @@ describe('API Tests', function () {
             done()
           })
       })
+      it('should reject bad queue id')
     })
 
     describe('GET /api/v1/users', function () {
@@ -491,6 +492,19 @@ describe('API Tests', function () {
       })
     })
 
+    describe('POST /api/v1/users', function () {
+      it('should update user data')
+      it('should reject bad user data')
+      it('should reject bad user id')
+      it('should update user roles')
+    })
+
+    describe('DELETE /api/v1/users', function () {
+      it('should delete user')
+      it('should reject bad user id')
+      it('should not allow delete self')
+    })
+
     describe('GET /api/v1/user', function () {
       it('should return user data', function (done) {
         chai
@@ -540,6 +554,10 @@ describe('API Tests', function () {
               })
           })
       })
+    })
+
+    describe('GET /api/v1/roles', function () {
+      it('should get roles')
     })
   }) // end admin user tests
 
@@ -762,6 +780,14 @@ describe('API Tests', function () {
       })
     })
 
+    describe('POST /api/v1/users', function () {
+      it('should not allow updates')
+    })
+
+    describe('DELETE /api/v1/users', function () {
+      it('should not allow deletes')
+    })
+
     describe('GET /api/v1/user', function () {
       it('should return user data', function (done) {
         chai
@@ -811,6 +837,10 @@ describe('API Tests', function () {
               })
           })
       })
+    })
+
+    describe('GET /api/v1/roles', function () {
+      it('should not get roles')
     })
   }) // end student 1 user tests
 

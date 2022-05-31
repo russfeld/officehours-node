@@ -7,6 +7,7 @@ const { raw } = require('objection')
 //var db = require('../configs/db')
 const Queue = require('../models/queue')
 const User = require('../models/user')
+const Role = require('../models/role')
 
 // Load Token Middleware
 var token = require('../middlewares/token')
@@ -110,6 +111,51 @@ router.get('/users', async function (req, res, next) {
   }
 })
 
+router.post('/users/:id', async function (req, res, next) {
+  if (req.is_admin) {
+    try {
+      // strip out other data from users
+      const roles = req.body.user.roles.map(({ id, ...next }) => {
+        return {
+          id: id,
+        }
+      })
+      await User.query().upsertGraph(
+        {
+          id: req.params.id,
+          name: req.body.user.name,
+          contact_info: req.body.user.contact_info,
+          roles: roles,
+        },
+        {
+          relate: true,
+          unrelate: true,
+        }
+      )
+      res.sendStatus(204)
+    } catch (error) {
+      res.status(422)
+      res.json(error)
+    }
+  } else {
+    res.sendStatus(403)
+  }
+})
+
+router.delete('/users/:id', async function (req, res, next) {
+  if (req.is_admin) {
+    try {
+      await User.query().deleteById(req.params.id)
+      res.sendStatus(204)
+    } catch (error) {
+      res.status(422)
+      res.json(error)
+    }
+  } else {
+    res.sendStatus(403)
+  }
+})
+
 router.get('/user', async function (req, res, next) {
   let user = await User.query().findById(req.user_id)
   res.json(user)
@@ -125,6 +171,16 @@ router.post('/user', async function (req, res, next) {
   } catch (error) {
     res.status(422)
     res.json(error)
+  }
+})
+
+/* Get Roles List */
+router.get('/roles', async function (req, res, next) {
+  if (req.is_admin) {
+    let roles = await Role.query().select('id', 'name')
+    res.json(roles)
+  } else {
+    res.sendStatus(403)
   }
 })
 
