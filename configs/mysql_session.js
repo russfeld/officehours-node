@@ -12,3 +12,5 @@ var options = {
 var mysql_session = new MySQLStore(options)
 
 module.exports = mysql_session
+
+// TODO Switch to Knex sessions?
