@@ -419,6 +419,11 @@ describe('API Tests', function () {
       it('should reject bad queue id')
     })
 
+    describe('DELETE /api/v1/queues', function () {
+      it('should delete queue')
+      it('should reject bad queue id')
+    })
+
     describe('GET /api/v1/users', function () {
       it('should return an array of size 4', function (done) {
         chai
@@ -765,6 +770,11 @@ describe('API Tests', function () {
             done()
           })
       })
+    })
+
+    describe('DELETE /api/v1/queues', function () {
+      it('should delete queue')
+      it('should reject bad queue id')
     })
 
     describe('GET /api/v1/users', function () {

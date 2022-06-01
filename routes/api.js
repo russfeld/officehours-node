@@ -96,6 +96,20 @@ router.post('/queues/:id', async function (req, res, next) {
   }
 })
 
+router.delete('/queues/:id', async function (req, res, next) {
+  if (req.is_admin) {
+    try {
+      await Queue.query().deleteById(req.params.id)
+      res.sendStatus(204)
+    } catch (error) {
+      res.status(422)
+      res.json(error)
+    }
+  } else {
+    res.sendStatus(403)
+  }
+})
+
 /* Get Users List */
 router.get('/users', async function (req, res, next) {
   if (req.is_admin) {
