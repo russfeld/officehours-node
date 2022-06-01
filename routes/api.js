@@ -99,8 +99,12 @@ router.post('/queues/:id', async function (req, res, next) {
 router.delete('/queues/:id', async function (req, res, next) {
   if (req.is_admin) {
     try {
-      await Queue.query().deleteById(req.params.id)
-      res.sendStatus(204)
+      var deleted = await Queue.query().deleteById(req.params.id)
+      if (deleted === 1) {
+        res.sendStatus(204)
+      } else {
+        res.sendStatus(422)
+      }
     } catch (error) {
       res.status(422)
       res.json(error)
@@ -113,10 +117,11 @@ router.delete('/queues/:id', async function (req, res, next) {
 router.put('/queues', async function (req, res, next) {
   if (req.is_admin) {
     try {
-      await Queue.query().insert({
+      const inserted = await Queue.query().insert({
         name: req.body.name,
       })
-      res.sendStatus(204)
+      res.status(201)
+      res.json(inserted)
     } catch (error) {
       res.status(422)
       res.json(error)
@@ -130,7 +135,7 @@ router.put('/queues', async function (req, res, next) {
 router.get('/users', async function (req, res, next) {
   if (req.is_admin) {
     let users = await User.query()
-      .select('users.id', 'users.eid', 'users.name')
+      .select('users.id', 'users.eid', 'users.name', 'users.contact_info')
       .withGraphJoined('roles')
       .modifyGraph('roles', (builder) => {
         builder.select('roles.id', 'roles.name')
@@ -175,8 +180,9 @@ router.post('/users/:id', async function (req, res, next) {
 router.put('/users', async function (req, res, next) {
   if (req.is_admin) {
     try {
-      await User.findOrCreate(req.body.eid)
-      res.sendStatus(204)
+      const user = await User.findOrCreate(req.body.eid)
+      res.status(201)
+      res.json(user)
     } catch (error) {
       res.status(422)
       res.json(error)
@@ -188,9 +194,16 @@ router.put('/users', async function (req, res, next) {
 
 router.delete('/users/:id', async function (req, res, next) {
   if (req.is_admin) {
+    if (req.params.id == req.user_id) {
+      res.sendStatus(422)
+    }
     try {
-      await User.query().deleteById(req.params.id)
-      res.sendStatus(204)
+      var deleted = await User.query().deleteById(req.params.id)
+      if (deleted === 1) {
+        res.sendStatus(204)
+      } else {
+        res.sendStatus(422)
+      }
     } catch (error) {
       res.status(422)
       res.json(error)

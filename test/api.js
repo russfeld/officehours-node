@@ -416,17 +416,123 @@ describe('API Tests', function () {
             done()
           })
       })
-      it('should reject bad queue id')
+      it('should reject bad queue id', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/queues/4')
+          .type('json')
+          .send({
+            queue: {
+              name: 'Updated Queue',
+              snippet: 'Updated Snippet',
+              description: 'Updated Description',
+              users: [
+                {
+                  id: 2,
+                },
+              ],
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(422)
+            res.body.should.be.a('object')
+            res.body.should.have.property('name').eql('NotFoundError')
+            done()
+          })
+      })
     })
 
     describe('DELETE /api/v1/queues', function () {
-      it('should delete queue')
-      it('should reject bad queue id')
+      it('should delete queue', function (done) {
+        chai
+          .request(app)
+          .delete('/api/v1/queues/3')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/queues/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.a('array')
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: 1 })
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: 2 })
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.not.deep.include({ id: 3 })
+                done()
+              })
+          })
+      })
+      it('should reject bad queue id', function (done) {
+        chai
+          .request(app)
+          .delete('/api/v1/queues/4')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(422)
+            done()
+          })
+      })
     })
 
     describe('PUT /api/v1/queues', function () {
-      it('should create new queues')
-      it('should require a name')
+      it('should create new queues', function (done) {
+        chai
+          .request(app)
+          .put('/api/v1/queues/')
+          .type('json')
+          .send({
+            name: 'Test Queue',
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(201)
+            res.body.should.be.a('object')
+            res.body.should.have.property('id')
+            const new_id = res.body.id
+            chai
+              .request(app)
+              .get('/api/v1/queues/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.a('array')
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: new_id })
+                const queue = res.body.find((queue) => {
+                  return queue.id === new_id
+                })
+                queue.should.have.property('name').eql('Test Queue')
+                done()
+              })
+          })
+      })
+      it('should require a name', function (done) {
+        chai
+          .request(app)
+          .put('/api/v1/queues/')
+          .type('json')
+          .send({
+            name: '',
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(422)
+            res.body.should.be.a('object')
+            res.body.should.have.property('name').eql('ValidationError')
+            res.body.data.should.have.property('name')
+            done()
+          })
+      })
     })
 
     describe('GET /api/v1/users', function () {
@@ -503,21 +609,250 @@ describe('API Tests', function () {
     })
 
     describe('POST /api/v1/users', function () {
-      it('should update user data')
-      it('should reject bad user data')
-      it('should reject bad user id')
-      it('should update user roles')
+      it('should update user data', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/users/2')
+          .type('json')
+          .send({
+            user: {
+              name: 'Updated Name',
+              contact_info: 'Updated Contact Info',
+              roles: [],
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/users/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.a('array')
+                const user = res.body.find((user) => {
+                  return user.id === 2
+                })
+                user.should.have.property('name').eql('Updated Name')
+                user.should.have
+                  .property('contact_info')
+                  .eql('Updated Contact Info')
+                done()
+              })
+          })
+      })
+      it('should reject bad user data', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/users/2')
+          .type('json')
+          .send({
+            user: {
+              name: '',
+              contact_info: '',
+              roles: [],
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(422)
+            res.body.should.be.a('object')
+            res.body.should.have.property('name').eql('ValidationError')
+            res.body.data.should.have.property('name')
+            done()
+          })
+      })
+
+      it('should reject bad user id', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/users/5')
+          .type('json')
+          .send({
+            user: {
+              name: 'Updated Name',
+              contact_info: 'Updated Contact Info',
+              roles: [],
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.body.should.be.a('object')
+            res.body.should.have.property('name').eql('NotFoundError')
+            done()
+          })
+      })
+      it('should update user roles', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/users/2')
+          .type('json')
+          .send({
+            user: {
+              name: 'Updated Name',
+              contact_info: 'Updated Contact Info',
+              roles: [
+                {
+                  id: 1,
+                },
+              ],
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/users/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.a('array')
+                const user = res.body.find((user) => {
+                  return user.id === 2
+                })
+                user.roles
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: 1 })
+                chai
+                  .request(app)
+                  .post('/api/v1/users/2')
+                  .type('json')
+                  .send({
+                    user: {
+                      name: 'Updated Name',
+                      contact_info: 'Updated Contact Info',
+                      roles: [],
+                    },
+                  })
+                  .auth(token, { type: 'bearer' })
+                  .end((err, res) => {
+                    res.should.have.status(204)
+                    chai
+                      .request(app)
+                      .get('/api/v1/users/')
+                      .auth(token, { type: 'bearer' })
+                      .end((err, res) => {
+                        res.should.have.status(200)
+                        res.body.should.be.a('array')
+                        const user = res.body.find((user) => {
+                          return user.id === 2
+                        })
+                        user.roles
+                          .map(({ id }) => ({ id }))
+                          .should.not.deep.include({ id: 1 })
+                        done()
+                      })
+                  })
+              })
+          })
+      })
     })
 
     describe('DELETE /api/v1/users', function () {
-      it('should delete user')
-      it('should reject bad user id')
-      it('should not allow delete self')
+      it('should delete user', function (done) {
+        chai
+          .request(app)
+          .delete('/api/v1/users/4')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(204)
+            chai
+              .request(app)
+              .get('/api/v1/users/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.a('array')
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: 1 })
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: 2 })
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: 3 })
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.not.deep.include({ id: 4 })
+                done()
+              })
+          })
+      })
+      it('should reject bad user id', function (done) {
+        chai
+          .request(app)
+          .delete('/api/v1/users/5')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(422)
+            done()
+          })
+      })
+      it('should not allow delete self', function (done) {
+        chai
+          .request(app)
+          .delete('/api/v1/users/1')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(422)
+            done()
+          })
+      })
     })
 
     describe('PUT /api/v1/users', function () {
-      it('should create new user')
-      it('should require an eID with 3 characters')
+      it('should create new user', function (done) {
+        chai
+          .request(app)
+          .put('/api/v1/users/')
+          .type('json')
+          .send({
+            eid: 'test-student-4',
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(201)
+            res.body.should.be.a('object')
+            res.body.should.have.property('id')
+            const new_id = res.body.id
+            chai
+              .request(app)
+              .get('/api/v1/users/')
+              .auth(token, { type: 'bearer' })
+              .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.a('array')
+                res.body
+                  .map(({ id }) => ({ id }))
+                  .should.deep.include({ id: new_id })
+                const user = res.body.find((user) => {
+                  return user.id === new_id
+                })
+                user.should.have.property('eid').eql('test-student-4')
+                done()
+              })
+          })
+      })
+      it('should require an eID with 3 characters', function (done) {
+        chai
+          .request(app)
+          .put('/api/v1/users/')
+          .type('json')
+          .send({
+            eid: 'ab',
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(422)
+            res.body.should.be.a('object')
+            res.body.should.have.property('name').eql('ValidationError')
+            res.body.data.should.have.property('eid')
+            done()
+          })
+      })
     })
 
     describe('GET /api/v1/user', function () {
@@ -572,7 +907,22 @@ describe('API Tests', function () {
     })
 
     describe('GET /api/v1/roles', function () {
-      it('should get roles')
+      it('should get roles', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/roles/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(200)
+            res.body.should.be.a('array')
+            res.body.should.have.a.lengthOf(1)
+            const role = res.body.find((role) => {
+              return role.id === 1
+            })
+            role.should.have.property('name').eql('admin')
+            done()
+          })
+      })
     })
   }) // end admin user tests
 
@@ -783,11 +1133,32 @@ describe('API Tests', function () {
     })
 
     describe('DELETE /api/v1/queues', function () {
-      it('should not allow access')
+      it('should not allow access', function (done) {
+        chai
+          .request(app)
+          .delete('/api/v1/queues/3')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(403)
+            done()
+          })
+      })
     })
 
     describe('PUT /api/v1/queues', function () {
-      it('should not allow access')
+      it('should not allow access', function (done) {
+        chai
+          .request(app)
+          .put('/api/v1/queues/')
+          .send({
+            name: 'Test Queue',
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(403)
+            done()
+          })
+      })
     })
 
     describe('GET /api/v1/users', function () {
@@ -804,15 +1175,52 @@ describe('API Tests', function () {
     })
 
     describe('POST /api/v1/users', function () {
-      it('should not allow updates')
+      it('should not allow updates', function (done) {
+        chai
+          .request(app)
+          .post('/api/v1/users/1')
+          .send({
+            user: {
+              name: 'Updated Name',
+              contact_info: 'Updated Contact Info',
+              roles: [],
+            },
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(403)
+            done()
+          })
+      })
     })
 
     describe('DELETE /api/v1/users', function () {
-      it('should not allow deletes')
+      it('should not allow deletes', function (done) {
+        chai
+          .request(app)
+          .delete('/api/v1/users/1')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(403)
+            done()
+          })
+      })
     })
 
     describe('PUT /api/v1/users', function () {
-      it('should not allow access')
+      it('should not allow access', function (done) {
+        chai
+          .request(app)
+          .put('/api/v1/users/')
+          .send({
+            eid: 'test-student-4',
+          })
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(403)
+            done()
+          })
+      })
     })
 
     describe('GET /api/v1/user', function () {
@@ -867,7 +1275,16 @@ describe('API Tests', function () {
     })
 
     describe('GET /api/v1/roles', function () {
-      it('should not get roles')
+      it('should not get roles', function (done) {
+        chai
+          .request(app)
+          .get('/api/v1/roles/')
+          .auth(token, { type: 'bearer' })
+          .end((err, res) => {
+            res.should.have.status(403)
+            done()
+          })
+      })
     })
   }) // end student 1 user tests
 
