@@ -110,6 +110,22 @@ router.delete('/queues/:id', async function (req, res, next) {
   }
 })
 
+router.put('/queues', async function (req, res, next) {
+  if (req.is_admin) {
+    try {
+      await Queue.query().insert({
+        name: req.body.name,
+      })
+      res.sendStatus(204)
+    } catch (error) {
+      res.status(422)
+      res.json(error)
+    }
+  } else {
+    res.sendStatus(403)
+  }
+})
+
 /* Get Users List */
 router.get('/users', async function (req, res, next) {
   if (req.is_admin) {
@@ -146,6 +162,20 @@ router.post('/users/:id', async function (req, res, next) {
           unrelate: true,
         }
       )
+      res.sendStatus(204)
+    } catch (error) {
+      res.status(422)
+      res.json(error)
+    }
+  } else {
+    res.sendStatus(403)
+  }
+})
+
+router.put('/users', async function (req, res, next) {
+  if (req.is_admin) {
+    try {
+      await User.findOrCreate(req.body.eid)
       res.sendStatus(204)
     } catch (error) {
       res.status(422)

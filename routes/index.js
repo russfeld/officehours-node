@@ -85,9 +85,9 @@ router.post('/token', async function (req, res, next) {
       req.body.refresh_token,
       process.env.TOKEN_SECRET,
       async (err, data) => {
-        console.log('Debugging old refresh tokens')
-        console.log(err)
-        console.log(data)
+        // console.log('Debugging old refresh tokens')
+        // console.log(err)
+        // console.log(data)
         if (err) {
           res.sendStatus(401)
         }

@@ -424,6 +424,11 @@ describe('API Tests', function () {
       it('should reject bad queue id')
     })
 
+    describe('PUT /api/v1/queues', function () {
+      it('should create new queues')
+      it('should require a name')
+    })
+
     describe('GET /api/v1/users', function () {
       it('should return an array of size 4', function (done) {
         chai
@@ -508,6 +513,11 @@ describe('API Tests', function () {
       it('should delete user')
       it('should reject bad user id')
       it('should not allow delete self')
+    })
+
+    describe('PUT /api/v1/users', function () {
+      it('should create new user')
+      it('should require an eID with 3 characters')
     })
 
     describe('GET /api/v1/user', function () {
@@ -773,8 +783,11 @@ describe('API Tests', function () {
     })
 
     describe('DELETE /api/v1/queues', function () {
-      it('should delete queue')
-      it('should reject bad queue id')
+      it('should not allow access')
+    })
+
+    describe('PUT /api/v1/queues', function () {
+      it('should not allow access')
     })
 
     describe('GET /api/v1/users', function () {
@@ -796,6 +809,10 @@ describe('API Tests', function () {
 
     describe('DELETE /api/v1/users', function () {
       it('should not allow deletes')
+    })
+
+    describe('PUT /api/v1/users', function () {
+      it('should not allow access')
     })
 
     describe('GET /api/v1/user', function () {
