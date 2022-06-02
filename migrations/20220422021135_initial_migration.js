@@ -39,6 +39,7 @@ exports.up = function (knex) {
       table.string('name', 255).unique().notNullable()
       table.text('snippet')
       table.text('description')
+      table.boolean('is_open')
       table.timestamps()
     })
     .createTable('user_queues', function (table) {

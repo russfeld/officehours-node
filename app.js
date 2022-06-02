@@ -7,12 +7,11 @@ const logger = require('morgan')
 const session = require('express-session')
 const debug = require('debug')('app')
 const cors = require('cors')
-const ws = require('ws')
 
 // Default Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-// Load Environment constiables
+// Load Environment Variable
 require('dotenv').config()
 debug('Environment:\n' + process.env)
 
@@ -25,27 +24,6 @@ const apiRouter = require('./routes/api')
 
 // Create Express Application
 const app = express()
-
-// Create Web Socket Server
-const wss = new ws.WebSocketServer({ noServer: true })
-
-// Test WSS Connections
-wss.on('connection', (ws) => {
-  console.log('Socket Connected!')
-  ws.on('message', (data) => {
-    console.log('Message received!')
-    console.log(data)
-  })
-})
-
-// Upgrade Socket Connection
-const upgrade = function (req, socket, head) {
-  console.log('Upgrade received!')
-  wss.handleUpgrade(req, socket, head, (ws) => {
-    console.log('Handling Upgrade')
-    wss.emit('connection', ws, req)
-  })
-}
 
 // Set up MySQL Session
 app.use(
@@ -107,5 +85,4 @@ app.use(function (err, req, res, next) {
   res.render('error')
 })
 
-module.exports.app = app
-module.exports.upgrade = upgrade
+module.exports = app

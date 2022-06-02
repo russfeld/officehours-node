@@ -4,7 +4,8 @@
  * Module dependencies.
  */
 
-var { app, upgrade }  = require('../app');
+var app  = require('../app');
+var upgrade = require('../sockets/queues');
 var debug = require('debug')('officehours-node:server');
 var http = require('http');
 
