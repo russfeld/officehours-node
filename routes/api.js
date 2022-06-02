@@ -31,6 +31,7 @@ router.get('/queues', async function (req, res, next) {
         'queues.name',
         'queues.snippet',
         'queues.description',
+        'queues.is_open',
         raw('true AS helper'),
         raw('true AS editable')
       )
@@ -46,6 +47,7 @@ router.get('/queues', async function (req, res, next) {
         'queues.name',
         'snippet',
         'description',
+        'is_open',
         raw('false AS editable')
       )
       .withGraphJoined('users')
