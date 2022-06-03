@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "lint:check": "eslint .",
     "lint": "eslint --fix .",
-    "test": "mocha --timeout 10000 --exit"
+    "test": "mocha --require test/hooks.js --recursive --timeout 500 --exit"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
