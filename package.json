@@ -28,6 +28,7 @@
     "node-cas-authentication": "^0.0.15",
     "objection": "^3.0.1",
     "pug": "2.0.0-beta11",
+    "socket.io": "^4.5.1",
     "ws": "^8.7.0"
   },
   "devDependencies": {

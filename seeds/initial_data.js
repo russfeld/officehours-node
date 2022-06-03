@@ -77,7 +77,7 @@ exports.seed = async function (knex) {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan.',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan. Aenean sed ornare neque. Duis eget mi vitae eros porttitor vehicula nec eu erat. Proin convallis molestie orci eu interdum. In luctus tincidunt elit sit amet condimentum. Nunc quis velit lorem. Morbi eleifend tempus auctor. Sed posuere elementum dui a semper. Quisque non risus at libero porttitor venenatis aliquam ut ante. Nunc mauris dolor, mattis id diam nec, euismod efficitur mauris.',
-      is_open: 1,
+      is_open: 0,
       created_at: '2022-01-01T00:00:00',
       updated_at: '2022-01-01T00:00:00',
     },
@@ -99,7 +99,7 @@ exports.seed = async function (knex) {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan.',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan. Aenean sed ornare neque. Duis eget mi vitae eros porttitor vehicula nec eu erat. Proin convallis molestie orci eu interdum. In luctus tincidunt elit sit amet condimentum. Nunc quis velit lorem. Morbi eleifend tempus auctor. Sed posuere elementum dui a semper. Quisque non risus at libero porttitor venenatis aliquam ut ante. Nunc mauris dolor, mattis id diam nec, euismod efficitur mauris.',
-      is_open: 0,
+      is_open: 1,
       created_at: '2022-01-01T00:00:00',
       updated_at: '2022-01-01T00:00:00',
     },
