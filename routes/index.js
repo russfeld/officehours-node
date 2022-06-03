@@ -90,6 +90,7 @@ router.post('/token', async function (req, res, next) {
         // console.log(data)
         if (err) {
           res.sendStatus(401)
+          return
         }
 
         if (data && data.refresh_token) {

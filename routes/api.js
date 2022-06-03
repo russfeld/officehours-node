@@ -98,6 +98,41 @@ router.post('/queues/:id', async function (req, res, next) {
   }
 })
 
+router.post('/queues/:id/toggle', async function (req, res, next) {
+  const id = req.params.id
+  if (req.is_admin) {
+    var queue = await Queue.query().findById(id)
+    if (queue) {
+      if (queue.is_open == 0) {
+        queue.is_open = 1
+      } else {
+        queue.is_open = 0
+      }
+      await queue.$query().patch()
+      res.sendStatus(204)
+    } else {
+      res.sendStatus(422)
+    }
+  } else {
+    queue = await Queue.query().findById(id).withGraphJoined('users')
+    if (queue) {
+      if (queue.users.some((user) => user.id === req.user_id)) {
+        if (queue.is_open == 0) {
+          queue.is_open = 1
+        } else {
+          queue.is_open = 0
+        }
+        await queue.$query().patch()
+        res.sendStatus(204)
+      } else {
+        res.sendStatus(422)
+      }
+    } else {
+      res.sendStatus(403)
+    }
+  }
+})
+
 router.delete('/queues/:id', async function (req, res, next) {
   if (req.is_admin) {
     try {

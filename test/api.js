@@ -443,6 +443,12 @@ describe('API Tests', function () {
       })
     })
 
+    describe('POST /api/v1/queues/:id/toggle', function () {
+      it('should toggle queue 1')
+      it('should toggle queue 2')
+      it('should toggle queue 3')
+    })
+
     describe('DELETE /api/v1/queues', function () {
       it('should delete queue', function (done) {
         chai
@@ -1132,6 +1138,12 @@ describe('API Tests', function () {
       })
     })
 
+    describe('POST /api/v1/queues/:id/toggle', function () {
+      it('should toggle queue 1')
+      it('should not toggle queue 2')
+      it('should not toggle queue 3')
+    })
+
     describe('DELETE /api/v1/queues', function () {
       it('should not allow access', function (done) {
         chai
@@ -1354,6 +1366,12 @@ describe('API Tests', function () {
       })
     }) // end GET /api/v1/queues
 
+    describe('POST /api/v1/queues/:id/toggle', function () {
+      it('should toggle queue 1')
+      it('should toggle queue 2')
+      it('should not toggle queue 3')
+    })
+
     describe('GET /api/v1/user', function () {
       it('should return user data', function (done) {
         chai
@@ -1471,6 +1489,12 @@ describe('API Tests', function () {
           })
       })
     }) // end GET /api/v1/queues
+
+    describe('POST /api/v1/queues/:id/toggle', function () {
+      it('should toggle queue 1')
+      it('should toggle queue 2')
+      it('should toggle queue 3')
+    })
 
     describe('GET /api/v1/user', function () {
       it('should return user data', function (done) {
