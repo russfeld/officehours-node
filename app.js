@@ -20,6 +20,7 @@ const mysql_session = require('./configs/mysql_session')
 
 // Load Routers
 const indexRouter = require('./routes/index')
+const authRouter = require('./routes/auth')
 const apiRouter = require('./routes/api')
 
 // Create Express Application
@@ -67,6 +68,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 // Routers
 app.use('/', indexRouter)
+app.use('/auth', authRouter)
 app.use('/api/v1', apiRouter)
 
 // Catch 404 and forward to error handler

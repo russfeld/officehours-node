@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test'
 process.env.FORCE_AUTH = 'true'
 
 //Require app dependencies
-var app = require('../app')
+require('../app')
 let db = require('../configs/db')
 
 // Root Hook Runs Before Each Test

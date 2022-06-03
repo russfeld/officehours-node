@@ -3,20 +3,20 @@ extends layout
 block content
   h1= title
   p Welcome to App
-  a(href="/login") CAS Login
+  a(href="/auth/login") CAS Login
   br
-  a(href="/login?eid=test-admin") Login as Test Admin
+  a(href="/auth/login?eid=test-admin") Login as Test Admin
   br
-  a(href="/login?eid=test-student-1") Login as Test Student 1
+  a(href="/auth/login?eid=test-student-1") Login as Test Student 1
   br
-  a(href="/login?eid=test-student-2") Login as Test Student 2
+  a(href="/auth/login?eid=test-student-2") Login as Test Student 2
   br
-  a(href="/login?eid=test-student-3") Login as Test Student 3
+  a(href="/auth/login?eid=test-student-3") Login as Test Student 3
   br
-  a(href="/token") Get Token
+  a(href="/auth/token") Get Token
   br
   a(href="http://localhost:3001") Back to App 
   br
-  a(href="/logout") Logout
+  a(href="/auth/logout") Logout
   br
   p You are #{JSON.stringify(data, null, 2)}
