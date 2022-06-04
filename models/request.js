@@ -3,7 +3,7 @@ const Model = require('./base')
 class Request extends Model {
   // Table name is the only required property.
   static get tableName() {
-    return 'request'
+    return 'requests'
   }
 
   // Each model must have a column (or a set of columns) that uniquely
@@ -29,7 +29,7 @@ class Request extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['queue_id, user_id, status_id'],
+      required: ['queue_id', 'user_id', 'status_id'],
     }
   }
 
