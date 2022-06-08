@@ -5,18 +5,19 @@ const User = require('../models/user')
 async function authenticateToken(socket, next) {
   const token = socket.handshake.auth.token
 
-  if (token == null) return res.sendStatus(401)
+  if (token == null) {
+    next(new Error('No Token'))
+    return
+  }
 
   jwt.verify(token, process.env.TOKEN_SECRET, async (err, user) => {
-    
-
     if (err) {
       if (err.name === 'TokenExpiredError') {
-        next(new Error("Token Expired"))
-        return;
+        next(new Error('Token Expired'))
+        return
       } else {
-        next(new Error("Token Parse Error"))
-        return;
+        next(new Error('Token Parse Error'))
+        return
       }
     }
 
