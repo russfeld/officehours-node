@@ -3,7 +3,7 @@ const KnexSessionStore = require('connect-session-knex')(session)
 const db = require('./db')
 
 const store = new KnexSessionStore({
-  knex: db
+  knex: db,
 })
 
 const knex_session = session({
