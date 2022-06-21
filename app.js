@@ -4,7 +4,7 @@ const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
-const session = require('express-session')
+//const session = require('express-session')
 const debug = require('debug')('app')
 const cors = require('cors')
 
@@ -16,7 +16,8 @@ require('dotenv').config()
 debug('Environment:\n' + process.env)
 
 // Load Configs
-const mysql_session = require('./configs/mysql_session')
+//const mysql_session = require('./configs/mysql_session')
+const session = require('./configs/session')
 
 // Load Routers
 const indexRouter = require('./routes/index')
@@ -26,15 +27,8 @@ const apiRouter = require('./routes/api')
 // Create Express Application
 const app = express()
 
-// Set up MySQL Session
-app.use(
-  session({
-    secret: process.env.APP_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    store: mysql_session,
-  })
-)
+// Set up Sessions
+app.use(session)
 
 // Enable CORS in development
 if (process.env.NODE_ENV === 'development') {
