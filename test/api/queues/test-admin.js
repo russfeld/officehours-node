@@ -252,10 +252,10 @@ describe('test-admin /api/v1/queues', function () {
     })
   })
 
-  describe('POST /:id/toggle', function () {
-    shared.shouldToggleQueue(1)
-    shared.shouldToggleQueue(2)
-    shared.shouldToggleQueue(3)
+  describe('POST /:id/open', function () {
+    shared.shouldOpenQueue(1)
+    shared.shouldOpenQueue(2)
+    shared.shouldOpenQueue(3)
   })
 
   describe('DELETE /:id', function () {

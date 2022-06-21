@@ -113,49 +113,36 @@ exports.shouldReturnQueuesAsNotEditable = function (ids) {
   })
 }
 
-exports.shouldToggleQueue = function (id) {
-  it('should toggle queue ' + id, function (done) {
+exports.shouldOpenQueue = function (id) {
+  it('should open queue ' + id, function (done) {
     chai
       .request(app)
-      .get('/api/v1/queues/')
+      .post('/api/v1/queues/' + id + '/open')
       .auth(this.token, { type: 'bearer' })
       .end((err, res) => {
         res.should.have.status(200)
-        res.body.should.be.a('array')
-        var queue = res.body.find((queue) => {
-          return queue.id === id
-        })
-        queue.should.have.property('is_open')
-        const original = queue.is_open
         chai
           .request(app)
-          .post('/api/v1/queues/' + id + '/toggle')
+          .get('/api/v1/queues/')
           .auth(this.token, { type: 'bearer' })
           .end((err, res) => {
             res.should.have.status(200)
-            chai
-              .request(app)
-              .get('/api/v1/queues/')
-              .auth(this.token, { type: 'bearer' })
-              .end((err, res) => {
-                res.should.have.status(200)
-                res.body.should.be.a('array')
-                var queue = res.body.find((queue) => {
-                  return queue.id === id
-                })
-                queue.should.have.property('is_open').not.eql(original)
-                done()
-              })
+            res.body.should.be.a('array')
+            var queue = res.body.find((queue) => {
+              return queue.id === id
+            })
+            queue.should.have.property('is_open').eql(1)
+            done()
           })
       })
   })
 }
 
-exports.shouldNotToggleQueue = function (id) {
-  it('should not toggle queue ' + id, function (done) {
+exports.shouldNotOpenQueue = function (id) {
+  it('should not open queue ' + id, function (done) {
     chai
       .request(app)
-      .post('/api/v1/queues/' + id + '/toggle')
+      .post('/api/v1/queues/' + id + '/open')
       .auth(this.token, { type: 'bearer' })
       .end((err, res) => {
         res.should.have.status(403)

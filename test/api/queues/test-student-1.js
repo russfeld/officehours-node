@@ -20,10 +20,10 @@ describe('test-student-1 /api/v1/queues', function () {
     shared.shouldNotAllowEdit(3)
   })
 
-  describe('POST /:id/toggle', function () {
-    shared.shouldToggleQueue(1)
-    shared.shouldNotToggleQueue(2)
-    shared.shouldNotToggleQueue(3)
+  describe('POST /:id/open', function () {
+    shared.shouldOpenQueue(1)
+    shared.shouldNotOpenQueue(2)
+    shared.shouldNotOpenQueue(3)
   })
 
   describe('DELETE /:id', function () {
