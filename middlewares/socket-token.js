@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-const User = require('../models/user')
+// const User = require('../models/user')
 
 async function authenticateToken(socket, next) {
   const token = socket.handshake.auth.token
@@ -22,19 +22,21 @@ async function authenticateToken(socket, next) {
     }
 
     socket.data.user_id = user.user_id
+    // HACK This trusts the JWT signature to give admin privs.
+    // See below for a DB method for this - less efficient.
+    socket.data.is_admin = user.is_admin
 
-    // check if admin
-    const roles = await User.relatedQuery('roles')
-      .for(user.user_id)
-      .select('name')
-    //Roles for current user
-    //console.log(roles)
-    //TODO Replace with token? One less DB call?
-    if (roles.some((r) => r.name === 'admin')) {
-      socket.data.is_admin = true
-    } else {
-      socket.data.is_admin = false
-    }
+    // // check if admin
+    // const roles = await User.relatedQuery('roles')
+    //   .for(user.user_id)
+    //   .select('name')
+    // //Roles for current user
+    // //console.log(roles)
+    // if (roles.some((r) => r.name === 'admin')) {
+    //   socket.data.is_admin = true
+    // } else {
+    //   socket.data.is_admin = false
+    // }
 
     next()
   })
