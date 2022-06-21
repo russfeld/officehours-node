@@ -1,16 +1,21 @@
-const session = require('express-session')
-const KnexSessionStore = require('connect-session-knex')(session)
-const db = require('./db')
+var session = require('express-session')
+var MySQLStore = require('express-mysql-session')(session)
 
-const store = new KnexSessionStore({
-  knex: db,
-})
+var options = {
+  host: process.env.MYSQL_HOST,
+  port: 3306,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+}
 
-const knex_session = session({
+var mysql_store = new MySQLStore(options)
+
+var mysql_session = session({
   secret: process.env.APP_SECRET,
   resave: false,
   saveUninitialized: true,
-  store: store,
+  store: mysql_store,
 })
 
-module.exports = knex_session
+module.exports = mysql_session
