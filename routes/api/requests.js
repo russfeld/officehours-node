@@ -11,7 +11,11 @@ router.get('/:id', async function (req, res, next) {
     .where('queue_id', req.params.id)
     .withGraphFetched('user')
     .modifyGraph('user', (builder) => {
-      builder.select('users.id', 'users.eid', 'users.name')
+      builder.select('users.id', 'users.name')
+    })
+    .withGraphFetched('helper')
+    .modifyGraph('helper', (builder) => {
+      builder.select('users.id', 'users.name', 'users.contact_info')
     })
   res.json(requests)
 })

@@ -61,7 +61,7 @@ class Request extends Model {
 
       helper: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Queue,
+        modelClass: User,
         join: {
           from: 'requests.helper_id',
           to: 'users.id',

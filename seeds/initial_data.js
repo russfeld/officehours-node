@@ -151,31 +151,16 @@ exports.seed = async function (knex) {
   await knex('statuses').insert([
     {
       id: '1',
-      name: 'New',
-      icon: null,
-    },
-    {
-      id: '2',
       name: 'Queued',
       icon: null,
     },
     {
-      id: '3',
+      id: '2',
       name: 'Ready',
       icon: null,
     },
     {
-      id: '4',
-      name: 'Delay',
-      icon: null,
-    },
-    {
-      id: '5',
-      name: 'Absent',
-      icon: null,
-    },
-    {
-      id: '6',
+      id: '3',
       name: 'Done',
       icon: null,
     },
