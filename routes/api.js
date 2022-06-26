@@ -7,7 +7,6 @@ const queueRouter = require('./api/queues')
 const usersRouter = require('./api/users')
 const profileRouter = require('./api/profile')
 const roleRouter = require('./api/roles')
-const requestRouter = require('./api/requests')
 
 // Load Token Middleware
 var token = require('../middlewares/token')
@@ -17,7 +16,6 @@ router.use('/queues', queueRouter)
 router.use('/users', usersRouter)
 router.use('/profile', profileRouter)
 router.use('/roles', roleRouter)
-router.use('/requests', requestRouter)
 
 /* GET API Version and User Details */
 router.get('/', function (req, res, next) {

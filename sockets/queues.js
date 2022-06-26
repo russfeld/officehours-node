@@ -3,30 +3,20 @@ const Request = require('../models/request')
 const Queue = require('../models/queue')
 
 const registerQueueHandlers = (io, socket) => {
-  const connectQueue = async (id, callback) => {
-    const queues = await Queue.query()
-      .withGraphJoined('users')
-      .where('queues.id', id)
-    if (queues.length > 0) {
-      const queue = queues[0]
-      if (queue.is_open) {
-        console.log(socket.data.user_id + ' connecting to queue ' + id)
-        socket.data.queue_id = id
-        if (
-          socket.data.is_admin ||
-          queue.users.some((user) => user.id === socket.data.user_id)
-        ) {
-          socket.data.is_helper = true
-          console.log(socket.data.user_id + ' is helper on queue ' + id)
-        }
-        socket.join('queue-' + id)
-        callback(200)
-        return
-      }
-    }
-    console.log(socket.data.user_id + ' unable to join queue ' + id)
-    socket.disconnect(true)
-    callback(404)
+  const connectQueue = async (callback) => {
+    const requests = await Request.query()
+      .where('queue_id', socket.data.queue_id)
+      .where('status_id', '<', 3)
+      .withGraphFetched('user')
+      .modifyGraph('user', (builder) => {
+        builder.select('users.id', 'users.name')
+      })
+      .withGraphFetched('helper')
+      .modifyGraph('helper', (builder) => {
+        builder.select('users.id', 'users.name', 'users.contact_info')
+      })
+    callback(200, requests)
+    return
   }
 
   const joinQueue = async (callback) => {
@@ -37,13 +27,14 @@ const registerQueueHandlers = (io, socket) => {
         .where('status_id', '<', 3)
         .first()
       if (!request) {
-        request = await Request.query().insert({
+        request = await Request.query().insertAndFetch({
           user_id: socket.data.user_id,
           queue_id: socket.data.queue_id,
           status_id: 1,
         })
-        socket.to('queue-' + socket.data.queue_id).emit('queue:update')
+        //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
       }
+      emitQueueUpdate(socket.data.queue_id, request.id)
       callback(200)
       return
     }
@@ -52,12 +43,12 @@ const registerQueueHandlers = (io, socket) => {
 
   const takeRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      console.log(socket.data.user_id + ' taking request ' + id)
+      // console.log(socket.data.user_id + ' taking request ' + id)
       await Request.query()
         .findById(id)
         .patch({ status_id: 2, helper_id: socket.data.user_id })
-      socket.to('queue-' + socket.data.queue_id).emit('queue:update')
-      // TODO emit ping directly to user?
+      emitQueueUpdate(socket.data.queue_id, id)
+      //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
       callback(200)
       return
     }
@@ -66,9 +57,10 @@ const registerQueueHandlers = (io, socket) => {
 
   const deleteRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      console.log(socket.data.user_id + ' deleting request ' + id)
+      // console.log(socket.data.user_id + ' deleting request ' + id)
       await Request.query().deleteById(id)
-      socket.to('queue-' + socket.data.queue_id).emit('queue:update')
+      emitQueueRemove(socket.data.queue_id, id)
+      //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
       callback(200)
       return
     }
@@ -77,9 +69,23 @@ const registerQueueHandlers = (io, socket) => {
 
   const finishRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      console.log(socket.data.user_id + ' finishing request ' + id)
+      // console.log(socket.data.user_id + ' finishing request ' + id)
       await Request.query().findById(id).patch({ status_id: 3 })
-      socket.to('queue-' + socket.data.queue_id).emit('queue:update')
+      emitQueueRemove(socket.data.queue_id, id)
+      //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
+      callback(200)
+      return
+    }
+    callback(403)
+  }
+
+  const openQueue = async (callback) => {
+    if (socket.data.is_helper) {
+      // console.log(
+      //   socket.data.user_id + ' opening queue ' + socket.data.queue_id
+      // )
+      await Queue.query().findById(socket.data.queue_id).patch({ is_open: 1 })
+      socket.to('queue-' + socket.data.queue_id).emit('queue:opening')
       callback(200)
       return
     }
@@ -88,12 +94,12 @@ const registerQueueHandlers = (io, socket) => {
 
   const closeQueue = async (callback) => {
     if (socket.data.is_helper) {
-      console.log(
-        socket.data.user_id + ' closing queue ' + socket.data.queue_id
-      )
-      socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
+      // console.log(
+      //   socket.data.user_id + ' closing queue ' + socket.data.queue_id
+      // )
       await Request.query().delete().where('queue_id', socket.data.queue_id)
       await Queue.query().findById(socket.data.queue_id).patch({ is_open: 0 })
+      socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
       // TODO: close all sockets on queue!
       callback(200)
       return
@@ -101,13 +107,31 @@ const registerQueueHandlers = (io, socket) => {
     callback(403)
   }
 
-  // TODO presence? Track connected users?
+  const emitQueueUpdate = async (id, request_id) => {
+    const request = await Request.query()
+      .findById(request_id)
+      .withGraphFetched('user')
+      .modifyGraph('user', (builder) => {
+        builder.select('users.id', 'users.name')
+      })
+      .withGraphFetched('helper')
+      .modifyGraph('helper', (builder) => {
+        builder.select('users.id', 'users.name', 'users.contact_info')
+      })
+    io.to('queue-' + id).emit('queue:update', request)
+  }
+
+  const emitQueueRemove = async (id, request_id) => {
+    io.to('queue-' + id).emit('queue:remove', request_id)
+  }
+
   socket.on('queue:connect', connectQueue)
   socket.on('queue:join', joinQueue)
   socket.on('request:take', takeRequest)
   socket.on('request:delete', deleteRequest)
   socket.on('request:finish', finishRequest)
   socket.on('queue:close', closeQueue)
+  socket.on('queue:open', openQueue)
 }
 
 module.exports = registerQueueHandlers

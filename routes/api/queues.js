@@ -83,42 +83,6 @@ router.post('/:id', adminOnly, async function (req, res, next) {
   }
 })
 
-/* Toggle Queue */
-router.post('/:id/open', async function (req, res, next) {
-  const id = req.params.id
-  if (req.is_admin) {
-    var queue = await Queue.query().findById(id)
-    if (queue) {
-      queue.is_open = 1
-      await queue.$query().patch()
-      res.status(200)
-      res.json({ message: 'Queue Opened ' })
-    } else {
-      res.status(422)
-      res.json({ error: 'Queue Not Found' })
-    }
-  } else {
-    var queues = await Queue.query()
-      .withGraphJoined('users')
-      .where('queues.id', id)
-    if (queues.length > 0) {
-      queue = queues[0]
-      if (queue.users.some((user) => user.id === req.user_id)) {
-        queue.is_open = 1
-        await queue.$query().patch()
-        res.status(200)
-        res.json({ message: 'Queue Opened ' })
-      } else {
-        res.status(403)
-        res.json({ error: 'Helpers Only' })
-      }
-    } else {
-      res.status(422)
-      res.json({ error: 'Queue Not Found' })
-    }
-  }
-})
-
 /* Delete Single Queue */
 router.delete('/:id', adminOnly, async function (req, res, next) {
   try {
