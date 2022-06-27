@@ -4,6 +4,7 @@ const socketToken = require('./middlewares/socket-token')
 const socketQueue = require('./middlewares/socket-queue')
 
 const io = new Server({
+  // TODO Fix CORS when deploy
   cors: {
     origin: 'http://localhost:3001',
   },
@@ -20,6 +21,7 @@ io.on('connection', connectionEvent)
 // Presence
 // https://stackoverflow.com/questions/32134623/socket-io-determine-if-a-user-is-online-or-offline
 let users = {}
+let helpers = {}
 
 io.on('connection', (socket) => {
   try {
@@ -31,6 +33,14 @@ io.on('connection', (socket) => {
     }
     users[socket.data.queue_id][socket.data.user_id].push(socket.id)
     //console.log(socket.data.user_id + " online on queue " + socket.data.queue_id)
+    if (socket.data.is_helper) {
+      if (!helpers[socket.data.queue_id]) {
+        helpers[socket.data.queue_id] = {}
+      }
+      if (!helpers[socket.data.queue_id][socket.data.user_id]) {
+        helpers[socket.data.queue_id][socket.data.user_id] = []
+      }
+    }
     io.to('queue-' + socket.data.queue_id).emit(
       'user:online',
       socket.data.user_id
@@ -60,6 +70,7 @@ io.on('connection', (socket) => {
         socket
           .to('queue-' + socket.data.queue_id)
           .emit('user:offline', socket.data.user_id)
+        delete users[socket.data.queue_id][socket.data.user_id]
       } else {
         //console.log("socket disconnect - user still has sockets")
       }
@@ -68,7 +79,31 @@ io.on('connection', (socket) => {
       //console.log("error disconnect")
       //console.log(error)
     }
+    if (socket.data.is_helper) {
+      try {
+        index = helpers[socket.data.queue_id][socket.data.user_id].findIndex(
+          (u) => u === socket.id
+        )
+        if (index >= 0) {
+          helpers[socket.data.queue_id][socket.data.user_id].splice(index, 1)
+        } else {
+          //console.log("socket disconnect - socket not found")
+        }
+        //console.log(socket.data.user_id + " offline on queue " + socket.data.queue_id)
+        if (helpers[socket.data.queue_id][socket.data.user_id].length === 0) {
+          delete helpers[socket.data.queue_id][socket.data.user_id]
+        } else {
+          //console.log("socket disconnect - user still has sockets")
+        }
+      } catch (error) {
+        // TODO error handling
+      }
+    }
   })
 })
 
-module.exports = io
+module.exports = {
+  socket: io,
+  users: users,
+  helpers: helpers,
+}
