@@ -2,7 +2,11 @@
 
 const jwt = require('jsonwebtoken')
 
+// Load Models
 // const User = require('../models/user')
+
+// Load Logger
+const logger = require('../configs/logger')
 
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization']
@@ -17,6 +21,7 @@ async function authenticateToken(req, res, next) {
       if (err.name === 'TokenExpiredError') {
         return res.sendStatus(401)
       } else {
+        logger.warn('API Token Parse Error - ' + JSON.stringify(err))
         return res.sendStatus(403)
       }
     }

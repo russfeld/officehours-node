@@ -1,6 +1,7 @@
 const Model = require('./base')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
+const logger = require('../configs/logger')
 
 class User extends Model {
   // Table name is the only required property.
@@ -32,6 +33,7 @@ class User extends Model {
           name: eid,
         }),
       ]
+      logger.info('User ' + eid + ' created')
     }
     return user[0]
   }

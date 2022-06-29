@@ -1,9 +1,13 @@
 // Load Models
 const Request = require('../models/request')
 const Queue = require('../models/queue')
+const logger = require('../configs/logger')
 
 const registerQueueHandlers = (io, socket) => {
   const connectQueue = async (callback) => {
+    logger.socket(
+      socket.data.user_eid + ' - queue:connect - ' + socket.data.queue_id
+    )
     const requests = await Request.query()
       .where('queue_id', socket.data.queue_id)
       .where('status_id', '<', 3)
@@ -21,6 +25,9 @@ const registerQueueHandlers = (io, socket) => {
 
   const joinQueue = async (callback) => {
     if (!socket.data.is_helper) {
+      logger.socket(
+        socket.data.user_eid + ' - queue:join - ' + socket.data.queue_id
+      )
       var request = await Request.query()
         .where('user_id', socket.data.user_id)
         .where('queue_id', socket.data.queue_id)
@@ -32,7 +39,6 @@ const registerQueueHandlers = (io, socket) => {
           queue_id: socket.data.queue_id,
           status_id: 1,
         })
-        //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
       }
       emitQueueUpdate(socket.data.queue_id, request.id)
       callback(200)
@@ -43,12 +49,17 @@ const registerQueueHandlers = (io, socket) => {
 
   const takeRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      // console.log(socket.data.user_id + ' taking request ' + id)
+      logger.socket(
+        socket.data.user_eid +
+          ' - request:take - ' +
+          socket.data.queue_id +
+          ' - ' +
+          id
+      )
       await Request.query()
         .findById(id)
         .patch({ status_id: 2, helper_id: socket.data.user_id })
       emitQueueUpdate(socket.data.queue_id, id)
-      //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
       callback(200)
       return
     }
@@ -57,10 +68,15 @@ const registerQueueHandlers = (io, socket) => {
 
   const deleteRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      // console.log(socket.data.user_id + ' deleting request ' + id)
+      logger.socket(
+        socket.data.user_eid +
+          ' - request:delete - ' +
+          socket.data.queue_id +
+          ' - ' +
+          id
+      )
       await Request.query().deleteById(id)
       emitQueueRemove(socket.data.queue_id, id)
-      //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
       callback(200)
       return
     }
@@ -69,10 +85,15 @@ const registerQueueHandlers = (io, socket) => {
 
   const finishRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      // console.log(socket.data.user_id + ' finishing request ' + id)
+      logger.socket(
+        socket.data.user_eid +
+          ' - request:finish - ' +
+          socket.data.queue_id +
+          ' - ' +
+          id
+      )
       await Request.query().findById(id).patch({ status_id: 3 })
       emitQueueRemove(socket.data.queue_id, id)
-      //socket.to('queue-' + socket.data.queue_id).emit('queue:update')
       callback(200)
       return
     }
@@ -81,9 +102,9 @@ const registerQueueHandlers = (io, socket) => {
 
   const openQueue = async (callback) => {
     if (socket.data.is_helper) {
-      // console.log(
-      //   socket.data.user_id + ' opening queue ' + socket.data.queue_id
-      // )
+      logger.socket(
+        socket.data.user_eid + ' - queue:open - ' + socket.data.queue_id
+      )
       await Queue.query().findById(socket.data.queue_id).patch({ is_open: 1 })
       socket.to('queue-' + socket.data.queue_id).emit('queue:opening')
       callback(200)
@@ -94,9 +115,9 @@ const registerQueueHandlers = (io, socket) => {
 
   const closeQueue = async (callback) => {
     if (socket.data.is_helper) {
-      // console.log(
-      //   socket.data.user_id + ' closing queue ' + socket.data.queue_id
-      // )
+      logger.socket(
+        socket.data.user_eid + ' - queue:close - ' + socket.data.queue_id
+      )
       await Request.query().delete().where('queue_id', socket.data.queue_id)
       await Queue.query().findById(socket.data.queue_id).patch({ is_open: 0 })
       socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
