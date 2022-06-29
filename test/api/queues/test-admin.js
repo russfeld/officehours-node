@@ -252,12 +252,6 @@ describe('test-admin /api/v1/queues', function () {
     })
   })
 
-  describe('POST /:id/open', function () {
-    shared.shouldOpenQueue(1)
-    shared.shouldOpenQueue(2)
-    shared.shouldOpenQueue(3)
-  })
-
   describe('DELETE /:id', function () {
     it('should delete queue', function (done) {
       chai

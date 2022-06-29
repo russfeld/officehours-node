@@ -19,12 +19,6 @@ describe('test-student-3 /api/v1/queues', function () {
     shared.shouldNotAllowEdit(3)
   })
 
-  describe('POST /:id/open', function () {
-    shared.shouldOpenQueue(1)
-    shared.shouldOpenQueue(2)
-    shared.shouldOpenQueue(3)
-  })
-
   describe('DELETE /:id', function () {
     shared.shouldNotAllowDelete(1)
     shared.shouldNotAllowDelete(2)

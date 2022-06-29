@@ -113,44 +113,6 @@ exports.shouldReturnQueuesAsNotEditable = function (ids) {
   })
 }
 
-exports.shouldOpenQueue = function (id) {
-  it('should open queue ' + id, function (done) {
-    chai
-      .request(app)
-      .post('/api/v1/queues/' + id + '/open')
-      .auth(this.token, { type: 'bearer' })
-      .end((err, res) => {
-        res.should.have.status(200)
-        chai
-          .request(app)
-          .get('/api/v1/queues/')
-          .auth(this.token, { type: 'bearer' })
-          .end((err, res) => {
-            res.should.have.status(200)
-            res.body.should.be.a('array')
-            var queue = res.body.find((queue) => {
-              return queue.id === id
-            })
-            queue.should.have.property('is_open').eql(1)
-            done()
-          })
-      })
-  })
-}
-
-exports.shouldNotOpenQueue = function (id) {
-  it('should not open queue ' + id, function (done) {
-    chai
-      .request(app)
-      .post('/api/v1/queues/' + id + '/open')
-      .auth(this.token, { type: 'bearer' })
-      .end((err, res) => {
-        res.should.have.status(403)
-        done()
-      })
-  })
-}
-
 exports.shouldNotAllowEdit = function (id) {
   it('should not allow editing queue ' + id, function (done) {
     chai
