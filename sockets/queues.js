@@ -100,7 +100,6 @@ const registerQueueHandlers = (io, socket) => {
       await Request.query().delete().where('queue_id', socket.data.queue_id)
       await Queue.query().findById(socket.data.queue_id).patch({ is_open: 0 })
       socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
-      // TODO: close all sockets on queue!
       callback(200)
       return
     }

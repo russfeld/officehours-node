@@ -41,23 +41,22 @@ io.on('connection', async (socket) => {
         helpers[socket.data.queue_id][socket.data.user_id] = []
       }
       helpers[socket.data.queue_id][socket.data.user_id].push(socket.id)
-      const helper = await User.query().findById(socket.data.user_id).select('id', 'name')
-      socket.to('queue-' + socket.data.queue_id).emit(
-        'helper:online',
-        helper
-      )
+      const helper = await User.query()
+        .findById(socket.data.user_id)
+        .select('id', 'name')
+      socket.to('queue-' + socket.data.queue_id).emit('helper:online', helper)
     } else {
-      
       if (!users[socket.data.queue_id][socket.data.user_id]) {
         users[socket.data.queue_id][socket.data.user_id] = []
       }
       users[socket.data.queue_id][socket.data.user_id].push(socket.id)
-      socket.to('queue-' + socket.data.queue_id).emit(
-        'user:online',
-        socket.data.user_id
-      )
+      socket
+        .to('queue-' + socket.data.queue_id)
+        .emit('user:online', socket.data.user_id)
     }
-    const helpersOnline = await User.query().findByIds(Object.getOwnPropertyNames(helpers[socket.data.queue_id])).select('id', 'name')
+    const helpersOnline = await User.query()
+      .findByIds(Object.getOwnPropertyNames(helpers[socket.data.queue_id]))
+      .select('id', 'name')
     socket.emit(
       'connected',
       Object.getOwnPropertyNames(users[socket.data.queue_id]),
@@ -66,7 +65,7 @@ io.on('connection', async (socket) => {
   } catch (error) {
     // TODO error handling
     //console.log("error connect")
-    console.log(error)
+    //console.log(error)
   }
 
   socket.on('disconnecting', () => {
@@ -91,10 +90,10 @@ io.on('connection', async (socket) => {
         }
       } catch (error) {
         // TODO error handling
-        console.log(error)
+        //console.log(error)
       }
     } else {
-      try{
+      try {
         var index = users[socket.data.queue_id][socket.data.user_id].findIndex(
           (u) => u === socket.id
         )
@@ -114,7 +113,7 @@ io.on('connection', async (socket) => {
         }
       } catch (error) {
         // TODO error handling
-        console.log(error)
+        //console.log(error)
       }
     }
   })
