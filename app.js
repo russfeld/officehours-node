@@ -30,7 +30,6 @@ app.use(session)
 // Enable CORS in development
 if (process.env.NODE_ENV === 'development') {
   app.use(
-    // TODO Fix CORS when deploy
     cors({
       origin: 'http://localhost:3001',
       credentials: true,

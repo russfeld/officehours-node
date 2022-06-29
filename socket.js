@@ -8,12 +8,16 @@ const logger = require('./configs/logger')
 // Load Models
 const User = require('./models/user')
 
-const io = new Server({
-  // TODO Fix CORS when deploy
-  cors: {
-    origin: 'http://localhost:3001',
-  },
-})
+var io
+if (process.env.NODE_ENV === 'development') {
+  io = new Server({
+    cors: {
+      origin: 'http://localhost:3001',
+    },
+  })
+} else {
+  io = new Server()
+}
 
 const connectionEvent = (socket) => {
   registerQueueHandlers(io, socket)
