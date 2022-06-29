@@ -2,8 +2,14 @@
 const express = require('express')
 const router = express.Router()
 
+// Load Configs
+const requestLogger = require('../middlewares/request-logger')
+
 // Load Models
 const User = require('../models/user')
+
+// Configure Logging
+router.use(requestLogger)
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {

@@ -4,7 +4,7 @@ const router = express.Router()
 const { raw } = require('objection')
 
 // Load Middleware
-const adminOnly = require('../../middlewares/admin_only')
+const adminOnly = require('../../middlewares/admin-only')
 
 // Load Models
 const Queue = require('../../models/queue')

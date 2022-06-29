@@ -5,9 +5,13 @@ const jwt = require('jsonwebtoken')
 
 // Load Configurations
 var cas = require('../configs/cas')
+const requestLogger = require('../middlewares/request-logger')
 
 // Load Models
 const User = require('../models/user')
+
+// Configure Logging
+router.use(requestLogger)
 
 /* Handle Logins */
 router.get('/login', async function (req, res, next) {
@@ -34,6 +38,7 @@ router.get('/login', async function (req, res, next) {
       let user = await User.findOrCreate(eid)
       // Store User ID in session
       req.session.user_id = user.id
+      req.session.user_eid = eid
     }
   }
   // Redirect to Homepage

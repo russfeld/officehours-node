@@ -3,8 +3,6 @@ const createError = require('http-errors')
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
-const logger = require('morgan')
-//const session = require('express-session')
 const debug = require('debug')('app')
 const cors = require('cors')
 
@@ -16,7 +14,6 @@ require('dotenv').config()
 debug('Environment:\n' + process.env)
 
 // Load Configs
-//const mysql_session = require('./configs/mysql_session')
 const session = require('./configs/session')
 
 // Load Routers
@@ -45,9 +42,8 @@ if (process.env.NODE_ENV === 'development') {
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 
-// Configure Logging
-// https://stackoverflow.com/questions/60129677/how-to-disable-morgan-request-logger-during-unit-test
-app.use(logger('dev', { skip: () => process.env.NODE_ENV === 'test' }))
+// Logging middleware is added in routers
+// to capture user ID information from token
 
 // JSON Middleware
 app.use(express.json())

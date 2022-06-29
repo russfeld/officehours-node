@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 // Load Middleware
-const adminOnly = require('../../middlewares/admin_only')
+const adminOnly = require('../../middlewares/admin-only')
 
 // Load Models
 const Role = require('../../models/role')
