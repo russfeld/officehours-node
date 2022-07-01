@@ -49,8 +49,9 @@ jobs:
       
       # Step 4 - Run Tests
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs#building-and-testing-your-code
-      - name: 4 - Run Tests
-        run: npm run test-json
+      # TODO Database? Config File?
+      # - name: 4 - Run Tests
+      #   run: npm run test-json
 
       # Step 5 - Publish Test Reports
       # https://github.com/marketplace/actions/test-reporter
