@@ -118,6 +118,7 @@ const registerQueueHandlers = (io, socket) => {
       logger.socket(
         socket.data.user_eid + ' - queue:close - ' + socket.data.queue_id
       )
+      // TODO Store Previous Data for Tracking
       await Request.query().delete().where('queue_id', socket.data.queue_id)
       await Queue.query().findById(socket.data.queue_id).patch({ is_open: 0 })
       socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
