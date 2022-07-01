@@ -17,23 +17,46 @@ var http = require('http');
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+// Get Logger
+const logger = require('../configs/logger')
+
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
-socket.attach(server);
+ var server = http.createServer(app);
+ socket.attach(server);
+ 
+ /**
+  * Listen on provided port, on all network interfaces.
+  */
+ server.on('error', onError);
+ server.on('listening', onListening);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-
-// Respond to upgrade requests - send to web socket
-//server.on('upgrade', upgrade);
+// Migrate Database on Startup
+const db = require('../configs/db')
+db.migrate.currentVersion()
+  .then(function(version) {
+    logger.info("Database Migration Version: " + version)
+    if (version == 'none') {
+      logger.info("Database Empty - Migrating and Seeding")
+      db.migrate.latest()
+      .then(function() {
+        return db.seed.run();
+      })
+      .then(function() {
+        logger.info("Complete!")
+        server.listen(port);
+      })
+    } else {
+      logger.info("Database Exists - Migrating")
+      db.migrate.latest()
+      .then(function() {
+        logger.info("Complete!")
+        server.listen(port);
+      })
+    }
+  })
 
 /**
  * Normalize a port into a number, string, or false.
@@ -92,5 +115,5 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  logger.info('Listening on ' + bind);
 }
