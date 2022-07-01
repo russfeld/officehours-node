@@ -5,6 +5,8 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const debug = require('debug')('app')
 const cors = require('cors')
+const compression = require('compression')
+const helmet = require('helmet')
 
 // Default Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -53,11 +55,20 @@ app.use(express.urlencoded({ extended: false }))
 // Parse Cookies
 app.use(cookieParser())
 
+// Enable Compression
+app.use(compression())
+
+// Add Helmet Protection
+app.use(helmet())
+
+if (process.env.NODE_ENV == 'development') {
+  app.use('/', indexRouter)
+}
+
 // Serve Static Resources
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Routers
-app.use('/', indexRouter)
 app.use('/auth', authRouter)
 app.use('/api/v1', apiRouter)
 
