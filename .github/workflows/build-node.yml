@@ -1,0 +1,97 @@
+# Build Node Workflow
+# 
+# Based on Starter Workflow Here
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+# Workflow name
+name: Build Node
+
+# Run only on pushes and pull requests on main branch, as well as tags
+# https://docs.github.com/en/actions/using-workflows/triggering-a-workflow
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:    
+      - main
+
+# Define a single job named build
+jobs:
+  build:
+
+    # Run job on Ubuntu runner
+    runs-on: ubuntu-latest
+
+    # Job Steps
+    steps:
+
+      # Step 1 - Checkout the Repository
+      # https://github.com/actions/checkout
+      - name: 1 - Checkout Repository
+        uses: actions/checkout@v3
+      
+      # Step 2 - Set up Node
+      # https://github.com/actions/setup-node
+      - name: 2- Set up Node LTS
+        uses: actions/setup-python@v2
+        with:
+          python-version: '16'     # Version range or exact version of a Node version to use
+          cache: 'npm'             # Cache NPM dependencies
+
+      # Step 3 - Install Dependencies
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs#installing-dependencies
+      - name: 3 - Install Dependencies
+        run: |
+          npm ci 
+      
+      # Step 4 - Run Tests
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs#building-and-testing-your-code
+      - name: 4 - Run Tests
+        run: npm run test-json
+
+      # Step 5 - Publish Test Reports
+      # https://github.com/marketplace/actions/test-reporter
+      - name: 5 - Publish Test Reports
+        uses: dorny/test-reporter@v1
+        if: always()                # always run even if the previous step fails
+        with:
+          name: Mocha Tests            # Name of the check run which will be created
+          path: test-results.json      # Path to test results
+          reporter: mocha-json         # Format of test results
+      
+      # ----------------------------------------------------------
+      # THESE ONLY RUN IF BUILD SUCCEEDS
+      # ----------------------------------------------------------
+      
+      # ----------------------------------------------------------
+      # THESE ONLY RUN IF NEW TAG IS PUSHED - WILL CREATE RELEASE
+      # ----------------------------------------------------------
+
+      # Step 6 - Log In to GitHub Container Registry
+      # https://github.com/docker/login-action
+      - name: 6 - Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7 - Build and Push Docker Image
+      # https://github.com/docker/build-push-action
+      - name: 7 - Build and Push Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+              ghcr.io/${{ github.repository_owner }}/officehours:latest
+      
+      # Step 8 - Make Release on GitHub
+      # https://github.com/softprops/action-gh-release
+      - name: 8 - Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
