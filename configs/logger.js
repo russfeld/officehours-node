@@ -14,7 +14,7 @@ const levels = {
 const level = () => {
   const env = process.env.NODE_ENV || 'development'
   if (env === 'test') return 'error'
-  return env === 'development' ? 'debug' : 'warn'
+  return env === 'development' ? 'debug' : 'http'
 }
 
 const colors = {

@@ -7,6 +7,7 @@ const debug = require('debug')('app')
 const cors = require('cors')
 const compression = require('compression')
 const helmet = require('helmet')
+const history = require('connect-history-api-fallback')
 
 // Default Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -65,11 +66,17 @@ if (process.env.NODE_ENV == 'development') {
   app.use('/', indexRouter)
 }
 
+// Routers
+// Auth routes must come first
+app.use('/auth', authRouter)
+
+// Redirect other requests to Vue app
+app.use(history())
+
 // Serve Static Resources
 app.use(express.static(path.join(__dirname, 'public')))
 
-// Routers
-app.use('/auth', authRouter)
+// Handle any API routes last
 app.use('/api/v1', apiRouter)
 
 // Catch 404 and forward to error handler
