@@ -54,13 +54,14 @@ jobs:
 
       # Step 5 - Publish Test Reports
       # https://github.com/marketplace/actions/test-reporter
-      - name: 5 - Publish Test Reports
-        uses: dorny/test-reporter@v1
-        if: always()                # always run even if the previous step fails
-        with:
-          name: Mocha Tests            # Name of the check run which will be created
-          path: test-results.json      # Path to test results
-          reporter: mocha-json         # Format of test results
+      # TODO This is not working :(
+      # - name: 5 - Publish Test Reports
+      #   uses: dorny/test-reporter@v1
+      #   if: always()                # always run even if the previous step fails
+      #   with:
+      #     name: Mocha Tests            # Name of the check run which will be created
+      #     path: test-results.json      # Path to test results
+      #     reporter: mocha-json         # Format of test results
       
       # ----------------------------------------------------------
       # THESE ONLY RUN IF BUILD SUCCEEDS
