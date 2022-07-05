@@ -46,12 +46,14 @@ class User extends Model {
     return user[0]
   }
 
-  // TODO: Not sure if this works well with same user logged in multiple places
   async updateRefreshToken() {
-    const token = crypto.randomBytes(32).toString('hex')
-    await this.$query().patch({
-      refresh_token: token,
-    })
+    var token = this.refresh_token
+    if(!token) {
+      token = crypto.randomBytes(32).toString('hex')
+      await this.$query().patch({
+        refresh_token: token,
+      })
+    }
     const refresh_token = jwt.sign(
       {
         refresh_token: token,

@@ -32,6 +32,10 @@ jobs:
       # https://github.com/actions/checkout
       - name: 1 - Checkout Repository
         uses: actions/checkout@v3
+
+      # Step 1A - Checkout Submodules
+      - name: 1A - Checkout Submodules
+        run: git submodule update --init --recursive
       
       # Step 2 - Set up Node
       # https://github.com/actions/setup-node
