@@ -44,7 +44,7 @@ jobs:
       - name: 2- Set up Node LTS
         uses: actions/setup-node@v2
         with:
-          python-version: '16'     # Version range or exact version of a Node version to use
+          node-version: '16'     # Version range or exact version of a Node version to use
           cache: 'npm'             # Cache NPM dependencies
 
       # Step 3 - Install Dependencies
@@ -82,6 +82,7 @@ jobs:
       # https://github.com/docker/login-action
       - name: 6 - Login to GitHub Container Registry
         uses: docker/login-action@v1 
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -91,7 +92,9 @@ jobs:
       # https://github.com/docker/build-push-action
       - name: 7 - Build and Push Docker Image
         uses: docker/build-push-action@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
+          context: .
           push: true
           tags: |
               ghcr.io/${{ github.repository_owner }}/officehours:latest
