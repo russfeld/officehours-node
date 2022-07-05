@@ -33,7 +33,7 @@ jobs:
       - name: 1 - Checkout Repository
         uses: actions/checkout@v3
         with:
-          token: ${{ PAT }}
+          token: ${{ secrets.PAT }}
 
       # Step 1A - Checkout Submodules
       - name: 1A - Checkout Submodules
