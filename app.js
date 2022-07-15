@@ -16,6 +16,9 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 require('dotenv').config()
 debug('Environment:\n' + process.env)
 
+// Configure Timezone
+process.env.TZ = 'UTC'
+
 // Load Configs
 const session = require('./configs/session')
 

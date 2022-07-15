@@ -1,15 +1,15 @@
 services:
-  officehours:
-    build: .
-    container_name: officehours
-    restart: unless-stopped
-    ports:
-      - '3000:3000'
-    volumes:
-      - '/home/youboon2/projects/officehours-node/.env.docker:/usr/src/app/.env'
-    depends_on:
-      mysql:
-        condition: service_healthy
+  # officehours:
+  #   build: .
+  #   container_name: officehours
+  #   restart: unless-stopped
+  #   ports:
+  #     - '3000:3000'
+  #   volumes:
+  #     - '/home/youboon2/projects/officehours-node/.env.docker:/usr/src/app/.env'
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
 
   mysql:
     image: mysql:5.7
@@ -23,7 +23,16 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_RANDOM_ROOT_PASSWORD: fact
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uofficehours", "-ppassword"]
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-uofficehours',
+          '-ppassword',
+        ]
       interval: 5s
       timeout: 5s
       retries: 20

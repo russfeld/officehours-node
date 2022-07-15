@@ -48,7 +48,7 @@ class User extends Model {
 
   async updateRefreshToken() {
     var token = this.refresh_token
-    if(!token) {
+    if (!token) {
       token = crypto.randomBytes(32).toString('hex')
       await this.$query().patch({
         refresh_token: token,
