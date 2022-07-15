@@ -164,5 +164,10 @@ exports.seed = async function (knex) {
       name: 'Done',
       icon: null,
     },
+    {
+      id: '4',
+      name: 'Requeued',
+      icon: null,
+    },
   ])
 }

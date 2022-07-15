@@ -57,7 +57,7 @@ jobs:
       #   run: |
       #     sudo systemctl start mysql.service
       #     sudo mysql -u root -e "create database officehours;"
-      
+
       # Step 4 - Run Tests
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs#building-and-testing-your-code
       # TODO Database? Config File?

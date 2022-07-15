@@ -100,6 +100,31 @@ const registerQueueHandlers = (io, socket) => {
     callback(403)
   }
 
+  const requeueRequest = async (id, callback) => {
+    if (socket.data.is_helper) {
+      logger.socket(
+        socket.data.user_eid +
+          ' - request:requeue - ' +
+          socket.data.queue_id +
+          ' - ' +
+          id
+      )
+      // Remove old request
+      const oldRequest = await Request.query().findById(id)
+      await oldRequest.$query().patch({ status_id: 4 })
+      emitQueueRemove(socket.data.queue_id, id)
+      // Enqueue new request
+      const request = await Request.query().insertAndFetch({
+        user_id: oldRequest.user_id,
+        queue_id: socket.data.queue_id,
+        status_id: 1,
+      })
+      emitQueueUpdate(socket.data.queue_id, request.id)
+      callback(200)
+    }
+    callback(403)
+  }
+
   const openQueue = async (callback) => {
     if (socket.data.is_helper) {
       logger.socket(
@@ -151,6 +176,7 @@ const registerQueueHandlers = (io, socket) => {
   socket.on('request:take', takeRequest)
   socket.on('request:delete', deleteRequest)
   socket.on('request:finish', finishRequest)
+  socket.on('request:requeue', requeueRequest)
   socket.on('queue:close', closeQueue)
   socket.on('queue:open', openQueue)
 }
