@@ -51,7 +51,14 @@ jobs:
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs#installing-dependencies
       - name: 3 - Install Dependencies
         run: |
-          npm ci 
+          npm ci
+
+      # Step 4A - Start MySQL
+      # TODO Continue work here
+      # - name: 4A - Start MySQL
+      #   run: |
+      #     sudo systemctl start mysql.service
+      #     sudo mysql -u root -e "create database officehours;"
       
       # Step 4 - Run Tests
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs#building-and-testing-your-code
