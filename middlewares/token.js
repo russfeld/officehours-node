@@ -21,7 +21,7 @@ async function authenticateToken(req, res, next) {
       if (err.name === 'TokenExpiredError') {
         return res.sendStatus(401)
       } else {
-        logger.warn('API Token Parse Error - ' + JSON.stringify(err))
+        logger.warn('API Token Parse Error - ' + err)
         return res.sendStatus(403)
       }
     }

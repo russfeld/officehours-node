@@ -9,9 +9,6 @@ const adminOnly = require('../../middlewares/admin-only')
 // Load Models
 const Queue = require('../../models/queue')
 
-// Load Socket Users
-const { helpers } = require('../../socket')
-
 /* Get Whole Queues List */
 router.get('/', async function (req, res, next) {
   if (req.is_admin) {
@@ -118,26 +115,26 @@ router.put('/', adminOnly, async function (req, res, next) {
 })
 
 /* Get Online Users */
-router.get('/online', async function (req, res, next) {
-  let queues = await Queue.query()
-    .select('queues.id')
-    .withGraphJoined('requests')
-    .modifyGraph('requests', (builder) => {
-      builder.select('requests.id')
-      builder.where('requests.status_id', '<', 3)
-    })
-  var online = {
-    helpers: {},
-    requests: {},
-  }
-  for (const queue of queues) {
-    online['helpers'][queue.id] = helpers[String(queue.id)]
-      ? Object.keys(helpers[String(queue.id)]).length
-      : 0
-    online['requests'][queue.id] = queue.requests.length
-  }
-  res.status(200)
-  res.json(online)
-})
+// router.get('/online', async function (req, res, next) {
+//   let queues = await Queue.query()
+//     .select('queues.id')
+//     .withGraphJoined('requests')
+//     .modifyGraph('requests', (builder) => {
+//       builder.select('requests.id')
+//       builder.where('requests.status_id', '<', 3)
+//     })
+//   var online = {
+//     helpers: {},
+//     requests: {},
+//   }
+//   for (const queue of queues) {
+//     online['helpers'][queue.id] = helpers[String(queue.id)]
+//       ? Object.keys(helpers[String(queue.id)]).length
+//       : 0
+//     online['requests'][queue.id] = queue.requests.length
+//   }
+//   res.status(200)
+//   res.json(online)
+// })
 
 module.exports = router

@@ -20,7 +20,7 @@ async function authenticateToken(socket, next) {
         next(new Error('Token Expired'))
         return
       } else {
-        logger.warn('Socket Token Parse Error - ' + JSON.stringify(err))
+        logger.warn('Socket Token Parse Error - ' + err)
         next(new Error('Token Parse Error'))
         return
       }
