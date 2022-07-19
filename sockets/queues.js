@@ -132,6 +132,10 @@ const registerQueueHandlers = (io, socket) => {
       )
       await Queue.query().findById(socket.data.queue_id).patch({ is_open: 1 })
       socket.to('queue-' + socket.data.queue_id).emit('queue:opening')
+      io.of('/status').emit('status:update', {
+        id: socket.data.queue_id,
+        is_open: 1,
+      })
       callback(200)
       return
     }
@@ -147,6 +151,10 @@ const registerQueueHandlers = (io, socket) => {
       await Request.query().delete().where('queue_id', socket.data.queue_id)
       await Queue.query().findById(socket.data.queue_id).patch({ is_open: 0 })
       socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
+      io.of('/status').emit('status:update', {
+        id: socket.data.queue_id,
+        is_open: 0,
+      })
       callback(200)
       return
     }
@@ -165,10 +173,20 @@ const registerQueueHandlers = (io, socket) => {
         builder.select('users.id', 'users.name', 'users.contact_info')
       })
     io.to('queue-' + id).emit('queue:update', request)
+    statusUpdate(id)
   }
 
   const emitQueueRemove = async (id, request_id) => {
     io.to('queue-' + id).emit('queue:remove', request_id)
+    statusUpdate(id)
+  }
+
+  const statusUpdate = async (id) => {
+    const count = await Request.query()
+      .where('queue_id', id)
+      .where('status_id', '<', 3)
+      .resultSize()
+    io.of('/status').emit('status:update', { id: id, requests: count })
   }
 
   socket.on('queue:connect', connectQueue)

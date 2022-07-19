@@ -29,6 +29,10 @@ const registerPresenceHandlers = async (io, socket) => {
             socket.id
         )
         socket.to('queue-' + socket.data.queue_id).emit('helper:online', helper)
+        io.of('/status').emit('status:update', {
+          id: socket.data.queue_id,
+          helpers: Object.keys(helpers[String(socket.data.queue_id)]).length,
+        })
       } else {
         logger.presence(
           socket.data.user_eid +
@@ -93,6 +97,11 @@ const registerPresenceHandlers = async (io, socket) => {
               .to('queue-' + socket.data.queue_id)
               .emit('helper:offline', socket.data.user_id)
             delete helpers[socket.data.queue_id][socket.data.user_id]
+            io.of('/status').emit('status:update', {
+              id: socket.data.queue_id,
+              helpers: Object.keys(helpers[String(socket.data.queue_id)])
+                .length,
+            })
           } else {
             logger.presence(
               socket.data.user_eid +
@@ -150,8 +159,12 @@ const registerPresenceHandlers = async (io, socket) => {
   })
 }
 
+const getHelpers = (queue_id) => {
+  if (!helpers[String(queue_id)]) return 0
+  return Object.keys(helpers[String(queue_id)]).length
+}
+
 module.exports = {
   registerPresenceHandlers: registerPresenceHandlers,
-  users: users,
-  helpers: helpers,
+  getHelpers: getHelpers,
 }
