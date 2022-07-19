@@ -1,2 +1,5 @@
 # Ignore bundled vue files
 public
+
+# Ignore submodule
+vue
