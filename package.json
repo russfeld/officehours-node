@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "scripts": {
-    "dev": "nodemon ./bin/www",
+    "dev": "nodemon ./bin/www --ignore vue",
     "start": "NODE_ENV=production node ./bin/www",
     "reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run",
     "format:check": "prettier --check .",
