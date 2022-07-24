@@ -1,6 +1,8 @@
 // Load Models
 const Request = require('../models/request')
 const Queue = require('../models/queue')
+const Period = require('../models/period')
+const { startPeriod, stopPeriod } = require('./presence')
 const logger = require('../configs/logger')
 
 const registerQueueHandlers = (io, socket) => {
@@ -130,7 +132,14 @@ const registerQueueHandlers = (io, socket) => {
       logger.socket(
         socket.data.user_eid + ' - queue:open - ' + socket.data.queue_id
       )
-      await Queue.query().findById(socket.data.queue_id).patch({ is_open: 1 })
+      const queue = await Queue.query().findById(socket.data.queue_id)
+      const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      const period = await Period.query().insert({
+        queue_name: queue.name,
+        opened_at: time,
+      })
+      startPeriod(socket.data.queue_id, time, period.id)
+      await queue.$query().patch({ is_open: 1, period_id: period.id })
       socket.to('queue-' + socket.data.queue_id).emit('queue:opening')
       io.of('/status').emit('status:update', {
         id: socket.data.queue_id,
@@ -147,9 +156,12 @@ const registerQueueHandlers = (io, socket) => {
       logger.socket(
         socket.data.user_eid + ' - queue:close - ' + socket.data.queue_id
       )
-      // TODO Store Previous Data for Tracking
       await Request.query().delete().where('queue_id', socket.data.queue_id)
-      await Queue.query().findById(socket.data.queue_id).patch({ is_open: 0 })
+      const queue = await Queue.query().findById(socket.data.queue_id)
+      const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      await Period.query().findById(queue.period_id).patch({ closed_at: time })
+      stopPeriod(socket.data.queue_id, time)
+      await queue.$query().patch({ is_open: 0, period_id: null })
       socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
       io.of('/status').emit('status:update', {
         id: socket.data.queue_id,

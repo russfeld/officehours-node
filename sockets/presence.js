@@ -1,11 +1,14 @@
 // Load Models
 const User = require('../models/user')
 const logger = require('../configs/logger')
+const Presence = require('../models/presence')
+const Queue = require('../models/queue')
 
 // Presence
 // https://stackoverflow.com/questions/32134623/socket-io-determine-if-a-user-is-online-or-offline
 let users = {}
 let helpers = {}
+let presences = {}
 
 const registerPresenceHandlers = async (io, socket) => {
   try {
@@ -14,6 +17,9 @@ const registerPresenceHandlers = async (io, socket) => {
     }
     if (!users[socket.data.queue_id]) {
       users[socket.data.queue_id] = {}
+    }
+    if (!presences[socket.data.queue_id]) {
+      presences[socket.data.queue_id] = {}
     }
     if (socket.data.is_helper) {
       if (!helpers[socket.data.queue_id][socket.data.user_id]) {
@@ -28,6 +34,16 @@ const registerPresenceHandlers = async (io, socket) => {
             ' - ' +
             socket.id
         )
+        const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+        const queue = await Queue.query()
+          .findById(socket.data.queue_id)
+          .select('period_id')
+        const presence = await Presence.query().insert({
+          eid: socket.data.user_eid,
+          online_at: time,
+          period_id: queue.period_id,
+        })
+        presences[socket.data.queue_id][socket.data.user_id] = presence.id
         socket.to('queue-' + socket.data.queue_id).emit('helper:online', helper)
         io.of('/status').emit('status:update', {
           id: socket.data.queue_id,
@@ -79,7 +95,7 @@ const registerPresenceHandlers = async (io, socket) => {
     logger.presence('Socket Presence Connection Error: ' + error)
   }
 
-  socket.on('disconnecting', () => {
+  socket.on('disconnecting', async () => {
     if (socket.data.is_helper) {
       try {
         index = helpers[socket.data.queue_id][socket.data.user_id].findIndex(
@@ -93,6 +109,11 @@ const registerPresenceHandlers = async (io, socket) => {
                 ' - helper:offline - ' +
                 socket.data.queue_id
             )
+            const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+            await Presence.query()
+              .findById(presences[socket.data.queue_id][socket.data.user_id])
+              .patch({ offline_at: time })
+            presences[socket.data.queue_id][socket.data.user_id] = null
             socket
               .to('queue-' + socket.data.queue_id)
               .emit('helper:offline', socket.data.user_id)
@@ -164,7 +185,34 @@ const getHelpers = (queue_id) => {
   return Object.keys(helpers[String(queue_id)]).length
 }
 
+const stopPeriod = async (queue_id, time) => {
+  if (!presences[queue_id]) return
+  for (const helper_id of Object.getOwnPropertyNames(presences[queue_id])) {
+    await Presence.query()
+      .findById(presences[queue_id][helper_id])
+      .patch({ offline_at: time })
+  }
+  presences[queue_id] = {}
+}
+
+const startPeriod = async (queue_id, time, period_id) => {
+  if (!helpers[String(queue_id)]) return
+  const helpersOnline = await User.query()
+    .findByIds(Object.getOwnPropertyNames(helpers[queue_id]))
+    .select('id', 'eid')
+  for (const helper of helpersOnline) {
+    const presence = await Presence.query().insert({
+      eid: helper.eid,
+      online_at: time,
+      period_id: period_id,
+    })
+    presences[queue_id][helper.id] = presence.id
+  }
+}
+
 module.exports = {
   registerPresenceHandlers: registerPresenceHandlers,
   getHelpers: getHelpers,
+  startPeriod: startPeriod,
+  stopPeriod: stopPeriod,
 }

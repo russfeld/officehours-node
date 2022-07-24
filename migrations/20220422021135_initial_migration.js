@@ -39,6 +39,8 @@ exports.up = function (knex) {
       table.string('name', 255).unique().notNullable()
       table.text('snippet')
       table.text('description')
+      table.text('webhook')
+      table.integer('period_id').unsigned().nullable()
       table.boolean('is_open')
       table.timestamps()
     })
@@ -92,6 +94,46 @@ exports.up = function (knex) {
         .onDelete('CASCADE')
       table.timestamps()
     })
+    .createTable('periods', function (table) {
+      table.increments('id')
+      table.text('queue_name')
+      table.datetime('opened_at')
+      table.datetime('closed_at').nullable()
+      table.timestamps()
+    })
+    .createTable('presences', function (table) {
+      table.increments('id')
+      table.text('eid')
+      table.datetime('online_at')
+      table.datetime('offline_at').nullable()
+      table
+        .integer('period_id')
+        .unsigned()
+        .references('id')
+        .inTable('periods')
+        .onDelete('CASCADE')
+      table.timestamps()
+    })
+    .createTable('events', function (table) {
+      table.increments('id')
+      table.text('eid')
+      table.text('status')
+      table
+        .integer('presence_id')
+        .unsigned()
+        .nullable()
+        .references('id')
+        .inTable('presences')
+        .onDelete('CASCADE')
+      table.datetime('timestamp')
+      table
+        .integer('period_id')
+        .unsigned()
+        .references('id')
+        .inTable('periods')
+        .onDelete('CASCADE')
+      table.timestamps()
+    })
 }
 
 /**
@@ -100,6 +142,9 @@ exports.up = function (knex) {
  */
 exports.down = function (knex) {
   return knex.schema
+    .dropTable('events')
+    .dropTable('presences')
+    .dropTable('periods')
     .dropTable('requests')
     .dropTable('statuses')
     .dropTable('user_queues')
