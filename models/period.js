@@ -29,7 +29,7 @@ class Period extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['queue_name', 'opened_at'],
+      required: ['queue_name', 'is_open'],
     }
   }
 

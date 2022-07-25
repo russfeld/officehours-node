@@ -60,11 +60,6 @@ exports.up = function (knex) {
       table.primary(['user_id', 'queue_id'])
       table.timestamps()
     })
-    .createTable('statuses', function (table) {
-      table.increments('id')
-      table.string('name', 255).unique().notNullable()
-      table.string('icon', 255)
-    })
     .createTable('requests', function (table) {
       table.increments('id')
       table
@@ -86,26 +81,19 @@ exports.up = function (knex) {
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
-      table
-        .integer('status_id')
-        .unsigned()
-        .references('id')
-        .inTable('statuses')
-        .onDelete('CASCADE')
+      table.integer('status_id').unsigned()
       table.timestamps()
     })
     .createTable('periods', function (table) {
       table.increments('id')
       table.text('queue_name')
-      table.datetime('opened_at')
-      table.datetime('closed_at').nullable()
+      table.boolean('is_open')
       table.timestamps()
     })
     .createTable('presences', function (table) {
       table.increments('id')
       table.text('eid')
-      table.datetime('online_at')
-      table.datetime('offline_at').nullable()
+      table.boolean('is_online')
       table
         .integer('period_id')
         .unsigned()
@@ -125,7 +113,6 @@ exports.up = function (knex) {
         .references('id')
         .inTable('presences')
         .onDelete('CASCADE')
-      table.datetime('timestamp')
       table
         .integer('period_id')
         .unsigned()
@@ -146,7 +133,6 @@ exports.down = function (knex) {
     .dropTable('presences')
     .dropTable('periods')
     .dropTable('requests')
-    .dropTable('statuses')
     .dropTable('user_queues')
     .dropTable('queues')
     .dropTable('user_roles')

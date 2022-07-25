@@ -149,40 +149,18 @@ exports.seed = async function (knex) {
     },
   ])
 
-  // Statuses
-  await knex('statuses').del()
-  await knex('statuses').insert([
-    {
-      id: '1',
-      name: 'Queued',
-      icon: null,
-    },
-    {
-      id: '2',
-      name: 'Ready',
-      icon: null,
-    },
-    {
-      id: '3',
-      name: 'Done',
-      icon: null,
-    },
-    {
-      id: '4',
-      name: 'Requeued',
-      icon: null,
-    },
-  ])
-
-  // Sessions
+  // Periods
   await knex('periods').del()
   await knex('periods').insert([
     {
       id: 1,
       queue_name: 'Queue 3',
-      opened_at: now,
+      is_open: 1,
       created_at: now,
       updated_at: now,
     },
   ])
+
+  // Presences
+  await knex('presences').del()
 }

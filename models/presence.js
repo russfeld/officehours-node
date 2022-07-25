@@ -29,7 +29,7 @@ class Presence extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['eid', 'online_at', 'period_id'],
+      required: ['eid', 'is_online', 'period_id'],
     }
   }
 

@@ -34,13 +34,12 @@ const registerPresenceHandlers = async (io, socket) => {
             ' - ' +
             socket.id
         )
-        const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
         const queue = await Queue.query()
           .findById(socket.data.queue_id)
           .select('period_id')
         const presence = await Presence.query().insert({
           eid: socket.data.user_eid,
-          online_at: time,
+          is_online: 1,
           period_id: queue.period_id,
         })
         presences[socket.data.queue_id][socket.data.user_id] = presence.id
@@ -109,10 +108,9 @@ const registerPresenceHandlers = async (io, socket) => {
                 ' - helper:offline - ' +
                 socket.data.queue_id
             )
-            const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
             await Presence.query()
               .findById(presences[socket.data.queue_id][socket.data.user_id])
-              .patch({ offline_at: time })
+              .patch({ is_online: 0 })
             presences[socket.data.queue_id][socket.data.user_id] = null
             socket
               .to('queue-' + socket.data.queue_id)
@@ -185,17 +183,17 @@ const getHelpers = (queue_id) => {
   return Object.keys(helpers[String(queue_id)]).length
 }
 
-const stopPeriod = async (queue_id, time) => {
+const stopPeriod = async (queue_id) => {
   if (!presences[queue_id]) return
   for (const helper_id of Object.getOwnPropertyNames(presences[queue_id])) {
     await Presence.query()
       .findById(presences[queue_id][helper_id])
-      .patch({ offline_at: time })
+      .patch({ is_online: 0 })
   }
   presences[queue_id] = {}
 }
 
-const startPeriod = async (queue_id, time, period_id) => {
+const startPeriod = async (queue_id, period_id) => {
   if (!helpers[String(queue_id)]) return
   const helpersOnline = await User.query()
     .findByIds(Object.getOwnPropertyNames(helpers[queue_id]))
@@ -203,11 +201,17 @@ const startPeriod = async (queue_id, time, period_id) => {
   for (const helper of helpersOnline) {
     const presence = await Presence.query().insert({
       eid: helper.eid,
-      online_at: time,
+      is_online: 1,
       period_id: period_id,
     })
     presences[queue_id][helper.id] = presence.id
   }
+}
+
+const getPresence = (queue_id, helper_id) => {
+  if (!presences[String(queue_id)]) return null
+  if (!presences[String(queue_id)][String(helper_id)]) return null
+  return presences[String(queue_id)][String(helper_id)]
 }
 
 module.exports = {
@@ -215,4 +219,5 @@ module.exports = {
   getHelpers: getHelpers,
   startPeriod: startPeriod,
   stopPeriod: stopPeriod,
+  getPresence: getPresence,
 }

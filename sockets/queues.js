@@ -2,8 +2,10 @@
 const Request = require('../models/request')
 const Queue = require('../models/queue')
 const Period = require('../models/period')
-const { startPeriod, stopPeriod } = require('./presence')
+const Event = require('../models/event')
+const { startPeriod, stopPeriod, getPresence } = require('./presence')
 const logger = require('../configs/logger')
+const User = require('../models/user')
 
 const registerQueueHandlers = (io, socket) => {
   const connectQueue = async (callback) => {
@@ -41,6 +43,14 @@ const registerQueueHandlers = (io, socket) => {
           queue_id: socket.data.queue_id,
           status_id: 1,
         })
+        const queue = await Queue.query()
+          .findById(socket.data.queue_id)
+          .select('period_id')
+        await Event.query().insert({
+          eid: socket.data.user_eid,
+          status: 'Queued',
+          period_id: queue.period_id,
+        })
       }
       emitQueueUpdate(socket.data.queue_id, request.id)
       callback(200)
@@ -58,9 +68,20 @@ const registerQueueHandlers = (io, socket) => {
           ' - ' +
           id
       )
-      await Request.query()
-        .findById(id)
-        .patch({ status_id: 2, helper_id: socket.data.user_id })
+      const request = await Request.query().patchAndFetchById(id, {
+        status_id: 2,
+        helper_id: socket.data.user_id,
+      })
+      const queue = await Queue.query()
+        .findById(socket.data.queue_id)
+        .select('period_id')
+      const user = await User.query().findById(request.user_id).select('eid')
+      await Event.query().insert({
+        eid: user.eid,
+        status: 'Taken',
+        period_id: queue.period_id,
+        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+      })
       emitQueueUpdate(socket.data.queue_id, id)
       callback(200)
       return
@@ -77,7 +98,19 @@ const registerQueueHandlers = (io, socket) => {
           ' - ' +
           id
       )
-      await Request.query().deleteById(id)
+      const request = await Request.query().patchAndFetchById(id, {
+        status_id: 5,
+      })
+      const queue = await Queue.query()
+        .findById(socket.data.queue_id)
+        .select('period_id')
+      const user = await User.query().findById(request.user_id).select('eid')
+      await Event.query().insert({
+        eid: user.eid,
+        status: 'Deleted',
+        period_id: queue.period_id,
+        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+      })
       emitQueueRemove(socket.data.queue_id, id)
       callback(200)
       return
@@ -94,7 +127,19 @@ const registerQueueHandlers = (io, socket) => {
           ' - ' +
           id
       )
-      await Request.query().findById(id).patch({ status_id: 3 })
+      const request = await Request.query().patchAndFetchById(id, {
+        status_id: 3,
+      })
+      const queue = await Queue.query()
+        .findById(socket.data.queue_id)
+        .select('period_id')
+      const user = await User.query().findById(request.user_id).select('eid')
+      await Event.query().insert({
+        eid: user.eid,
+        status: 'Finished',
+        period_id: queue.period_id,
+        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+      })
       emitQueueRemove(socket.data.queue_id, id)
       callback(200)
       return
@@ -112,14 +157,30 @@ const registerQueueHandlers = (io, socket) => {
           id
       )
       // Remove old request
-      const oldRequest = await Request.query().findById(id)
-      await oldRequest.$query().patch({ status_id: 4 })
+      const oldRequest = await Request.query().patchAndFetchById(id, {
+        status_id: 4,
+      })
+      const queue = await Queue.query()
+        .findById(socket.data.queue_id)
+        .select('period_id')
+      const user = await User.query().findById(oldRequest.user_id).select('eid')
+      await Event.query().insert({
+        eid: user.eid,
+        status: 'Requeued',
+        period_id: queue.period_id,
+        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+      })
       emitQueueRemove(socket.data.queue_id, id)
       // Enqueue new request
       const request = await Request.query().insertAndFetch({
         user_id: oldRequest.user_id,
         queue_id: socket.data.queue_id,
         status_id: 1,
+      })
+      await Event.query().insert({
+        eid: user.eid,
+        status: 'Queued',
+        period_id: queue.period_id,
       })
       emitQueueUpdate(socket.data.queue_id, request.id)
       callback(200)
@@ -133,12 +194,11 @@ const registerQueueHandlers = (io, socket) => {
         socket.data.user_eid + ' - queue:open - ' + socket.data.queue_id
       )
       const queue = await Queue.query().findById(socket.data.queue_id)
-      const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
       const period = await Period.query().insert({
         queue_name: queue.name,
-        opened_at: time,
+        is_open: 1,
       })
-      startPeriod(socket.data.queue_id, time, period.id)
+      startPeriod(socket.data.queue_id, period.id)
       await queue.$query().patch({ is_open: 1, period_id: period.id })
       socket.to('queue-' + socket.data.queue_id).emit('queue:opening')
       io.of('/status').emit('status:update', {
@@ -158,9 +218,8 @@ const registerQueueHandlers = (io, socket) => {
       )
       await Request.query().delete().where('queue_id', socket.data.queue_id)
       const queue = await Queue.query().findById(socket.data.queue_id)
-      const time = new Date().toISOString().slice(0, 19).replace('T', ' ')
-      await Period.query().findById(queue.period_id).patch({ closed_at: time })
-      stopPeriod(socket.data.queue_id, time)
+      await Period.query().findById(queue.period_id).patch({ is_open: 0 })
+      stopPeriod(socket.data.queue_id)
       await queue.$query().patch({ is_open: 0, period_id: null })
       socket.to('queue-' + socket.data.queue_id).emit('queue:closing')
       io.of('/status').emit('status:update', {

@@ -38,7 +38,6 @@ class Request extends Model {
     // Importing models here is one way to avoid require loops.
     const User = require('./user')
     const Queue = require('./queue')
-    const Status = require('./status')
 
     return {
       queue: {
@@ -65,15 +64,6 @@ class Request extends Model {
         join: {
           from: 'requests.helper_id',
           to: 'users.id',
-        },
-      },
-
-      status: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Status,
-        join: {
-          from: 'requests.status_id',
-          to: 'statuses.id',
         },
       },
     }
