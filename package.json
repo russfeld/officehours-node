@@ -44,7 +44,8 @@
     "mocha": "^10.0.0",
     "nodemon": "^2.0.18",
     "prettier": "^2.6.2",
-    "sinon": "^14.0.0"
+    "sinon": "^14.0.0",
+    "socket.io-client": "^4.5.1"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.6",

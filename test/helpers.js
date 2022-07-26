@@ -12,6 +12,7 @@ const loginAsAdmin = function (done) {
   agent.get('/auth/login?eid=test-admin').end(() => {
     agent.get('/auth/token').end((err, res) => {
       this.token = res.body.token
+      this.admin_token = res.body.token
       res.should.have.status(200)
       agent.close()
       done()
@@ -24,6 +25,7 @@ const loginAsStudent1 = function (done) {
   agent.get('/auth/login?eid=test-student-1').end(() => {
     agent.get('/auth/token').end((err, res) => {
       this.token = res.body.token
+      this.student1_token = res.body.token
       res.should.have.status(200)
       agent.close()
       done()
@@ -36,6 +38,7 @@ const loginAsStudent2 = function (done) {
   agent.get('/auth/login?eid=test-student-2').end(() => {
     agent.get('/auth/token').end((err, res) => {
       this.token = res.body.token
+      this.student2_token = res.body.token
       res.should.have.status(200)
       agent.close()
       done()
@@ -48,6 +51,7 @@ const loginAsStudent3 = function (done) {
   agent.get('/auth/login?eid=test-student-3').end(() => {
     agent.get('/auth/token').end((err, res) => {
       this.token = res.body.token
+      this.student3_token = res.body.token
       res.should.have.status(200)
       agent.close()
       done()
