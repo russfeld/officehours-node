@@ -149,6 +149,32 @@ exports.seed = async function (knex) {
     },
   ])
 
+  // Requests
+  await knex('requests').del()
+  await knex('requests').insert([
+    {
+      id: '1',
+      queue_id: '3',
+      user_id: '2',
+      status_id: '3',
+      helper_id: '1',
+    },
+    {
+      id: '2',
+      queue_id: '3',
+      user_id: '3',
+      status_id: '2',
+      helper_id: '4',
+    },
+    {
+      id: '3',
+      queue_id: '3',
+      user_id: '2',
+      status_id: '1',
+      helper_id: null,
+    },
+  ])
+
   // Periods
   await knex('periods').del()
 
