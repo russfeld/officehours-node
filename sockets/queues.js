@@ -29,32 +29,34 @@ const registerQueueHandlers = (io, socket) => {
 
   const joinQueue = async (callback) => {
     if (!socket.data.is_helper) {
-      logger.socket(
-        socket.data.user_eid + ' - queue:join - ' + socket.data.queue_id
-      )
-      var request = await Request.query()
-        .where('user_id', socket.data.user_id)
-        .where('queue_id', socket.data.queue_id)
-        .where('status_id', '<', 3)
-        .first()
-      if (!request) {
-        request = await Request.query().insertAndFetch({
-          user_id: socket.data.user_id,
-          queue_id: socket.data.queue_id,
-          status_id: 1,
-        })
-        const queue = await Queue.query()
-          .findById(socket.data.queue_id)
-          .select('period_id')
-        await Event.query().insert({
-          eid: socket.data.user_eid,
-          status: 'Queued',
-          period_id: queue.period_id,
-        })
+      const queue = await Queue.query()
+        .findById(socket.data.queue_id)
+        .select('period_id', 'is_open')
+      if (queue.is_open == 1) {
+        logger.socket(
+          socket.data.user_eid + ' - queue:join - ' + socket.data.queue_id
+        )
+        var request = await Request.query()
+          .where('user_id', socket.data.user_id)
+          .where('queue_id', socket.data.queue_id)
+          .where('status_id', '<', 3)
+          .first()
+        if (!request) {
+          request = await Request.query().insertAndFetch({
+            user_id: socket.data.user_id,
+            queue_id: socket.data.queue_id,
+            status_id: 1,
+          })
+          await Event.query().insert({
+            eid: socket.data.user_eid,
+            status: 'Queued',
+            period_id: queue.period_id,
+          })
+        }
+        emitQueueUpdate(socket.data.queue_id, request.id)
+        callback(200)
+        return
       }
-      emitQueueUpdate(socket.data.queue_id, request.id)
-      callback(200)
-      return
     }
     callback(403)
   }

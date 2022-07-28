@@ -22,11 +22,12 @@ describe('test-admin /api/v1/users', function () {
         .end((err, res) => {
           res.should.have.status(200)
           res.body.should.be.a('array')
-          res.body.should.have.a.lengthOf(4)
+          res.body.should.have.a.lengthOf(5)
           res.body.map(({ id }) => ({ id })).should.deep.include({ id: 1 })
           res.body.map(({ id }) => ({ id })).should.deep.include({ id: 2 })
           res.body.map(({ id }) => ({ id })).should.deep.include({ id: 3 })
           res.body.map(({ id }) => ({ id })).should.deep.include({ id: 4 })
+          res.body.map(({ id }) => ({ id })).should.deep.include({ id: 5 })
           done()
         })
     })
@@ -92,7 +93,7 @@ describe('test-admin /api/v1/users', function () {
     it('should reject bad user id', function (done) {
       chai
         .request(app)
-        .post('/api/v1/users/5')
+        .post('/api/v1/users/0')
         .type('json')
         .send({
           user: {
@@ -203,7 +204,7 @@ describe('test-admin /api/v1/users', function () {
     it('should reject bad user id', function (done) {
       chai
         .request(app)
-        .delete('/api/v1/users/5')
+        .delete('/api/v1/users/0')
         .auth(this.token, { type: 'bearer' })
         .end((err, res) => {
           res.should.have.status(422)

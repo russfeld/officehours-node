@@ -63,9 +63,24 @@ const loginAsStudent3 = function (done) {
   })
 }
 
+const loginAsStudent4 = function (done) {
+  var agent = chai.request.agent(app)
+  agent.get('/auth/login?eid=test-student-4').end(() => {
+    agent.get('/auth/token').end((err, res) => {
+      this.token = res.body.token
+      if (!this.tokens) this.tokens = {}
+      this.tokens['student4'] = res.body.token
+      res.should.have.status(200)
+      agent.close()
+      done()
+    })
+  })
+}
+
 module.exports = {
   loginAsAdmin: loginAsAdmin,
   loginAsStudent1: loginAsStudent1,
   loginAsStudent2: loginAsStudent2,
   loginAsStudent3: loginAsStudent3,
+  loginAsStudent4: loginAsStudent4,
 }

@@ -10,8 +10,9 @@
     "format": "prettier --write .",
     "lint:check": "eslint .",
     "lint": "eslint --fix .",
-    "test": "mocha --require test/hooks.js --recursive --timeout 500 --exit",
-    "test-json": "mocha --require test/hooks.js --recursive --timeout 500 --exit --reporter json > test-results.json"
+    "test": "mocha --require test/hooks.js --recursive --timeout 2000 --exit",
+    "cov": "nyc --reporter=html mocha --require test/hooks.js --recursive --timeout 2000 --exit",
+    "test-json": "mocha --require test/hooks.js --recursive --timeout 2000 --exit --reporter json > test-results.json"
   },
   "dependencies": {
     "compression": "^1.7.4",
@@ -43,6 +44,7 @@
     "eslint-config-prettier": "^8.5.0",
     "mocha": "^10.0.0",
     "nodemon": "^2.0.18",
+    "nyc": "^15.1.0",
     "prettier": "^2.6.2",
     "sinon": "^14.0.0",
     "socket.io-client": "^4.5.1"

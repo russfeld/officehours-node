@@ -57,6 +57,17 @@ exports.shouldOpenQueue = function (user) {
   })
 }
 
+exports.shouldEmitQueueOpeningAfterOpening = function (admin, user) {
+  it('should emit queue:opening after opening queue', function (done) {
+    this.sockets[user].on('queue:opening', () => {
+      done()
+    })
+    this.sockets[admin].emit('queue:open', (response) => {
+      response.should.equal(200)
+    })
+  })
+}
+
 exports.shouldCloseQueue = function (user) {
   it('should close the queue', function (done) {
     chai
@@ -108,6 +119,55 @@ exports.shouldCloseQueue = function (user) {
           })
         })
       })
+  })
+}
+
+exports.shouldEmitQueueClosingAfterClosing = function (admin, user) {
+  it('should emit queue:closing after closing queue', function (done) {
+    this.sockets[user].on('queue:closing', () => {
+      done()
+    })
+    this.sockets[admin].emit('queue:close', (response) => {
+      response.should.equal(200)
+    })
+  })
+}
+
+exports.shouldJoinOpenQueue = function (admin, user) {
+  it('should join open queue', function (done) {
+    this.sockets[admin].emit('queue:open', (response) => {
+      response.should.equal(200)
+      this.sockets[user].emit('queue:join', (response) => {
+        response.should.equal(200)
+        done()
+      })
+    })
+  })
+}
+
+exports.shouldEmitQueueUpdateAfterJoin = function (admin, user) {
+  it('should emit queue update after join', function (done) {
+    this.sockets[admin].emit('queue:open', (response) => {
+      response.should.equal(200)
+      this.sockets[admin].on('queue:update', (request) => {
+        request.should.have.property('user_id').eql(5)
+        request.should.have.property('queue_id').eql(3)
+        request.should.have.property('status_id').eql(1)
+        done()
+      })
+      this.sockets[user].emit('queue:join', (response) => {
+        response.should.equal(200)
+      })
+    })
+  })
+}
+
+exports.shouldNotJoinClosedQueue = function (user) {
+  it('should not join closed queue', function (done) {
+    this.sockets[user].emit('queue:join', (response) => {
+      response.should.equal(403)
+      done()
+    })
   })
 }
 

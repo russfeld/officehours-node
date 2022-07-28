@@ -57,6 +57,18 @@ const connectStudent3Socket = function (done) {
   this.sockets['student3'].on('connect', done)
 }
 
+const connectStudent4Socket = function (done) {
+  if (!this.sockets) this.sockets = {}
+  this.sockets['student4'] = new Client('http://localhost:3000', {
+    auth: {
+      token: this.tokens['student4'],
+      // HACK - make configurable
+      queue_id: 3,
+    },
+  })
+  this.sockets['student4'].on('connect', done)
+}
+
 const startSocketServer = function (done) {
   const server = createServer(app)
   socket.attach(server)
@@ -89,15 +101,22 @@ const closeStudent3Socket = function (done) {
   done()
 }
 
+const closeStudent4Socket = function (done) {
+  this.sockets['student4'].close()
+  done()
+}
+
 module.exports = {
   connectAdminSocket: connectAdminSocket,
   connectStudent1Socket: connectStudent1Socket,
   connectStudent2Socket: connectStudent2Socket,
   connectStudent3Socket: connectStudent3Socket,
+  connectStudent4Socket: connectStudent4Socket,
   startSocketServer: startSocketServer,
   stopSocketServer: stopSocketServer,
   closeAdminSocket: closeAdminSocket,
   closeStudent1Socket: closeStudent1Socket,
   closeStudent2Socket: closeStudent2Socket,
   closeStudent3Socket: closeStudent3Socket,
+  closeStudent4Socket: closeStudent4Socket,
 }

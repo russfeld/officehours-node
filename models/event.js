@@ -29,7 +29,7 @@ class Event extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['eid', 'status', 'timestamp', 'period_id'],
+      required: ['eid', 'status', 'period_id'],
     }
   }
 

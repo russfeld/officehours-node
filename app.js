@@ -8,6 +8,7 @@ const cors = require('cors')
 const compression = require('compression')
 const helmet = require('helmet')
 const history = require('connect-history-api-fallback')
+const logger = require('../configs/logger')
 
 // Default Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -90,6 +91,7 @@ app.use(function (req, res, next) {
 // Error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
+  logger.error(err)
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
 

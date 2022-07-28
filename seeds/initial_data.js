@@ -45,6 +45,15 @@ exports.seed = async function (knex) {
       created_at: now,
       updated_at: now,
     },
+    {
+      id: 5,
+      eid: 'test-student-4',
+      name: 'Test Student 4',
+      contact_info: null,
+      image: null,
+      created_at: now,
+      updated_at: now,
+    },
   ])
 
   // Roles
