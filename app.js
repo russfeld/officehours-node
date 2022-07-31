@@ -8,7 +8,9 @@ const cors = require('cors')
 const compression = require('compression')
 const helmet = require('helmet')
 const history = require('connect-history-api-fallback')
-const logger = require('../configs/logger')
+
+// Logger
+const logger = require('./configs/logger')
 
 // Default Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'

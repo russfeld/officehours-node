@@ -63,30 +63,39 @@ const registerQueueHandlers = (io, socket) => {
 
   const takeRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      logger.socket(
-        socket.data.user_eid +
-          ' - request:take - ' +
-          socket.data.queue_id +
-          ' - ' +
-          id
-      )
-      const request = await Request.query().patchAndFetchById(id, {
-        status_id: 2,
-        helper_id: socket.data.user_id,
-      })
       const queue = await Queue.query()
         .findById(socket.data.queue_id)
-        .select('period_id')
-      const user = await User.query().findById(request.user_id).select('eid')
-      await Event.query().insert({
-        eid: user.eid,
-        status: 'Taken',
-        period_id: queue.period_id,
-        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
-      })
-      emitQueueUpdate(socket.data.queue_id, id)
-      callback(200)
-      return
+        .select('period_id', 'is_open')
+      if (queue.is_open == 1) {
+        logger.socket(
+          socket.data.user_eid +
+            ' - request:take - ' +
+            socket.data.queue_id +
+            ' - ' +
+            id
+        )
+        try {
+          const request = await Request.query().patchAndFetchById(id, {
+            status_id: 2,
+            helper_id: socket.data.user_id,
+          })
+          const user = await User.query()
+            .findById(request.user_id)
+            .select('eid')
+          await Event.query().insert({
+            eid: user.eid,
+            status: 'Taken',
+            period_id: queue.period_id,
+            presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+          })
+          emitQueueUpdate(socket.data.queue_id, id)
+          callback(200)
+        } catch (e) {
+          logger.socket(e.stack)
+          callback(500)
+        }
+        return
+      }
     }
     callback(403)
   }

@@ -110,7 +110,7 @@ exports.seed = async function (knex) {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan.',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus a viverra nulla. Quisque sed aliquam neque. Curabitur at bibendum quam. Phasellus sit amet nibh ante. In tristique risus at iaculis accumsan. Aenean sed ornare neque. Duis eget mi vitae eros porttitor vehicula nec eu erat. Proin convallis molestie orci eu interdum. In luctus tincidunt elit sit amet condimentum. Nunc quis velit lorem. Morbi eleifend tempus auctor. Sed posuere elementum dui a semper. Quisque non risus at libero porttitor venenatis aliquam ut ante. Nunc mauris dolor, mattis id diam nec, euismod efficitur mauris.',
-      is_open: 0,
+      is_open: 1,
       period_id: 1,
       created_at: now,
       updated_at: now,
@@ -186,6 +186,13 @@ exports.seed = async function (knex) {
 
   // Periods
   await knex('periods').del()
+  await knex('periods').insert([
+    {
+      id: '1',
+      queue_name: 'Queue 3',
+      is_open: '1',
+    },
+  ])
 
   // Presences
   await knex('presences').del()

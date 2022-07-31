@@ -9,13 +9,27 @@ require('chai').should()
 var app = require('../../app')
 const { socket } = require('../../socket')
 
+const selectSocketQueue1 = function (done) {
+  this.queue_id = 1
+  done()
+}
+
+const selectSocketQueue2 = function (done) {
+  this.queue_id = 2
+  done()
+}
+
+const selectSocketQueue3 = function (done) {
+  this.queue_id = 3
+  done()
+}
+
 const connectAdminSocket = function (done) {
   if (!this.sockets) this.sockets = {}
   this.sockets['admin'] = new Client('http://localhost:3000', {
     auth: {
       token: this.tokens['admin'],
-      // HACK - make configurable
-      queue_id: 3,
+      queue_id: this.queue_id,
     },
   })
   this.sockets['admin'].on('connect', done)
@@ -26,8 +40,7 @@ const connectStudent1Socket = function (done) {
   this.sockets['student1'] = new Client('http://localhost:3000', {
     auth: {
       token: this.tokens['student1'],
-      // HACK - make configurable
-      queue_id: 3,
+      queue_id: this.queue_id,
     },
   })
   this.sockets['student1'].on('connect', done)
@@ -38,8 +51,7 @@ const connectStudent2Socket = function (done) {
   this.sockets['student2'] = new Client('http://localhost:3000', {
     auth: {
       token: this.tokens['student2'],
-      // HACK - make configurable
-      queue_id: 3,
+      queue_id: this.queue_id,
     },
   })
   this.sockets['student2'].on('connect', done)
@@ -50,8 +62,7 @@ const connectStudent3Socket = function (done) {
   this.sockets['student3'] = new Client('http://localhost:3000', {
     auth: {
       token: this.tokens['student3'],
-      // HACK - make configurable
-      queue_id: 3,
+      queue_id: this.queue_id,
     },
   })
   this.sockets['student3'].on('connect', done)
@@ -62,8 +73,7 @@ const connectStudent4Socket = function (done) {
   this.sockets['student4'] = new Client('http://localhost:3000', {
     auth: {
       token: this.tokens['student4'],
-      // HACK - make configurable
-      queue_id: 3,
+      queue_id: this.queue_id,
     },
   })
   this.sockets['student4'].on('connect', done)
@@ -119,4 +129,7 @@ module.exports = {
   closeStudent2Socket: closeStudent2Socket,
   closeStudent3Socket: closeStudent3Socket,
   closeStudent4Socket: closeStudent4Socket,
+  selectSocketQueue1: selectSocketQueue1,
+  selectSocketQueue2: selectSocketQueue2,
+  selectSocketQueue3: selectSocketQueue3,
 }
