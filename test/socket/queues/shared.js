@@ -294,3 +294,220 @@ exports.shouldStoreRequestAfterTake = function (admin) {
     })
   })
 }
+
+exports.shouldDeleteRequest = function (user) {
+  it('should delete request', function (done) {
+    this.sockets[user].emit('request:delete', 2, (response) => {
+      response.should.equal(200)
+      done()
+    })
+  })
+}
+
+exports.shouldNotDeleteRequest = function (user) {
+  it('should not delete request', function (done) {
+    this.sockets[user].emit('request:delete', 2, (response) => {
+      response.should.equal(403)
+      done()
+    })
+  })
+}
+
+exports.shouldNotDeleteRequestClosedQueue = function (user) {
+  it('should not delete request in closed queue', function (done) {
+    this.sockets[user].emit('request:delete', 2, (response) => {
+      response.should.equal(403)
+      done()
+    })
+  })
+}
+
+exports.shouldNotDeleteBadRequest = function (user) {
+  it('should not delete bad request', function (done) {
+    this.sockets[user].emit('request:delete', 0, (response) => {
+      response.should.equal(500)
+      done()
+    })
+  })
+}
+
+exports.shouldEmitQueueRemoveAfterDelete = function (admin, user) {
+  it('should emit queue remove after delete', function (done) {
+    this.sockets[user].on('queue:remove', (request) => {
+      request.should.eql(2)
+      done()
+    })
+    this.sockets[admin].emit('request:delete', 2, (response) => {
+      response.should.equal(200)
+    })
+  })
+}
+
+exports.shouldRemoveRequestAfterDelete = function (admin) {
+  it('should remove request after delete', function (done) {
+    this.sockets[admin].emit('request:delete', 2, (response) => {
+      response.should.equal(200)
+      this.sockets[admin].emit('queue:connect', (response, requests) => {
+        response.should.equal(200)
+        requests.should.be.a('array')
+        requests.map(({ id }) => ({ id })).should.not.deep.include({ id: 2 })
+        done()
+      })
+    })
+  })
+}
+
+exports.shouldFinishRequest = function (user) {
+  it('should finish request', function (done) {
+    this.sockets[user].emit('request:finish', 2, (response) => {
+      response.should.equal(200)
+      done()
+    })
+  })
+}
+
+exports.shouldNotFinishRequest = function (user) {
+  it('should not finish request', function (done) {
+    this.sockets[user].emit('request:finish', 2, (response) => {
+      response.should.equal(403)
+      done()
+    })
+  })
+}
+
+exports.shouldNotFinishRequestClosedQueue = function (user) {
+  it('should not finish request in closed queue', function (done) {
+    this.sockets[user].emit('request:finish', 2, (response) => {
+      response.should.equal(403)
+      done()
+    })
+  })
+}
+
+exports.shouldNotFinishBadRequest = function (user) {
+  it('should not finish bad request', function (done) {
+    this.sockets[user].emit('request:finish', 0, (response) => {
+      response.should.equal(500)
+      done()
+    })
+  })
+}
+
+exports.shouldEmitQueueRemoveAfterFinish = function (admin, user) {
+  it('should emit queue remove after finish', function (done) {
+    this.sockets[user].on('queue:remove', (request) => {
+      request.should.eql(2)
+      done()
+    })
+    this.sockets[admin].emit('request:finish', 2, (response) => {
+      response.should.equal(200)
+    })
+  })
+}
+
+exports.shouldRemoveRequestAfterFinish = function (admin) {
+  it('should remove request after finish', function (done) {
+    this.sockets[admin].emit('request:finish', 2, (response) => {
+      response.should.equal(200)
+      this.sockets[admin].emit('queue:connect', (response, requests) => {
+        response.should.equal(200)
+        requests.should.be.a('array')
+        requests.map(({ id }) => ({ id })).should.not.deep.include({ id: 2 })
+        done()
+      })
+    })
+  })
+}
+
+exports.shouldRequeueRequest = function (user) {
+  it('should requeue request', function (done) {
+    this.sockets[user].emit('request:requeue', 2, (response) => {
+      response.should.equal(200)
+      done()
+    })
+  })
+}
+
+exports.shouldNotRequeueRequest = function (user) {
+  it('should not requeue request', function (done) {
+    this.sockets[user].emit('request:requeue', 2, (response) => {
+      response.should.equal(403)
+      done()
+    })
+  })
+}
+
+exports.shouldNotRequeueRequestClosedQueue = function (user) {
+  it('should not requeue request in closed queue', function (done) {
+    this.sockets[user].emit('request:requeue', 2, (response) => {
+      response.should.equal(403)
+      done()
+    })
+  })
+}
+
+exports.shouldNotRequeueBadRequest = function (user) {
+  it('should not requeue bad request', function (done) {
+    this.sockets[user].emit('request:requeue', 0, (response) => {
+      response.should.equal(500)
+      done()
+    })
+  })
+}
+
+exports.shouldEmitQueueRemoveAfterRequeue = function (admin, user) {
+  it('should emit queue remove after requeue', function (done) {
+    this.sockets[user].on('queue:remove', (request) => {
+      request.should.eql(2)
+      done()
+    })
+    this.sockets[admin].emit('request:requeue', 2, (response) => {
+      response.should.equal(200)
+    })
+  })
+}
+
+exports.shouldRemoveRequestAfterRequeue = function (admin) {
+  it('should remove request after requeue', function (done) {
+    this.sockets[admin].emit('request:requeue', 2, (response) => {
+      response.should.equal(200)
+      this.sockets[admin].emit('queue:connect', (response, requests) => {
+        response.should.equal(200)
+        requests.should.be.a('array')
+        requests.map(({ id }) => ({ id })).should.not.deep.include({ id: 2 })
+        done()
+      })
+    })
+  })
+}
+
+exports.shouldEmitQueueUpdateAfterRequeue = function (admin, user) {
+  it('should emit queue update after requeue', function (done) {
+    this.sockets[user].on('queue:update', (request) => {
+      request.should.have.property('user_id').eql(3)
+      request.should.have.property('queue_id').eql(3)
+      request.should.have.property('status_id').eql(1)
+      done()
+    })
+    this.sockets[admin].emit('request:requeue', 2, (response) => {
+      response.should.equal(200)
+    })
+  })
+}
+
+exports.shouldStoreRequestAfterRequeue = function (admin) {
+  it('should store request after requeue', function (done) {
+    this.sockets[admin].emit('request:requeue', 2, (response) => {
+      response.should.equal(200)
+      this.sockets[admin].emit('queue:connect', (response, requests) => {
+        response.should.equal(200)
+        requests.should.be.a('array')
+        const request = requests.find((request) => {
+          return request.user_id === 3
+        })
+        request.should.have.property('status_id').eql(1)
+        done()
+      })
+    })
+  })
+}

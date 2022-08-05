@@ -22,6 +22,9 @@ describe('test-student-1 socket queues', function () {
   shared.shouldConnectToQueueSocket('student1')
   shared.shouldNotCloseQueue('student1')
   shared.shouldNotTakeRequest('student1')
+  shared.shouldNotDeleteRequest('student1')
+  shared.shouldNotFinishRequest('student1')
+  shared.shouldNotRequeueRequest('student1')
 
   afterEach(closeStudent1Socket)
   afterEach(stopSocketServer)

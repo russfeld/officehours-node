@@ -102,99 +102,133 @@ const registerQueueHandlers = (io, socket) => {
 
   const deleteRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      logger.socket(
-        socket.data.user_eid +
-          ' - request:delete - ' +
-          socket.data.queue_id +
-          ' - ' +
-          id
-      )
-      const request = await Request.query().patchAndFetchById(id, {
-        status_id: 5,
-      })
       const queue = await Queue.query()
         .findById(socket.data.queue_id)
-        .select('period_id')
-      const user = await User.query().findById(request.user_id).select('eid')
-      await Event.query().insert({
-        eid: user.eid,
-        status: 'Deleted',
-        period_id: queue.period_id,
-        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
-      })
-      emitQueueRemove(socket.data.queue_id, id)
-      callback(200)
-      return
+        .select('period_id', 'is_open')
+      if (queue.is_open == 1) {
+        logger.socket(
+          socket.data.user_eid +
+            ' - request:delete - ' +
+            socket.data.queue_id +
+            ' - ' +
+            id
+        )
+        try {
+          const request = await Request.query().patchAndFetchById(id, {
+            status_id: 5,
+          })
+          const user = await User.query()
+            .findById(request.user_id)
+            .select('eid')
+          await Event.query().insert({
+            eid: user.eid,
+            status: 'Deleted',
+            period_id: queue.period_id,
+            presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+          })
+          emitQueueRemove(socket.data.queue_id, id)
+          callback(200)
+        } catch (e) {
+          logger.socket(e.stack)
+          callback(500)
+        }
+        return
+      }
     }
     callback(403)
   }
 
   const finishRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      logger.socket(
-        socket.data.user_eid +
-          ' - request:finish - ' +
-          socket.data.queue_id +
-          ' - ' +
-          id
-      )
-      const request = await Request.query().patchAndFetchById(id, {
-        status_id: 3,
-      })
       const queue = await Queue.query()
         .findById(socket.data.queue_id)
-        .select('period_id')
-      const user = await User.query().findById(request.user_id).select('eid')
-      await Event.query().insert({
-        eid: user.eid,
-        status: 'Finished',
-        period_id: queue.period_id,
-        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
-      })
-      emitQueueRemove(socket.data.queue_id, id)
-      callback(200)
-      return
+        .select('period_id', 'is_open')
+      if (queue.is_open == 1) {
+        logger.socket(
+          socket.data.user_eid +
+            ' - request:finish - ' +
+            socket.data.queue_id +
+            ' - ' +
+            id
+        )
+        try {
+          const request = await Request.query().patchAndFetchById(id, {
+            status_id: 3,
+          })
+          const queue = await Queue.query()
+            .findById(socket.data.queue_id)
+            .select('period_id')
+          const user = await User.query()
+            .findById(request.user_id)
+            .select('eid')
+          await Event.query().insert({
+            eid: user.eid,
+            status: 'Finished',
+            period_id: queue.period_id,
+            presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+          })
+          emitQueueRemove(socket.data.queue_id, id)
+          callback(200)
+        } catch (e) {
+          logger.socket(e.stack)
+          callback(500)
+        }
+        return
+      }
     }
     callback(403)
   }
 
   const requeueRequest = async (id, callback) => {
     if (socket.data.is_helper) {
-      logger.socket(
-        socket.data.user_eid +
-          ' - request:requeue - ' +
-          socket.data.queue_id +
-          ' - ' +
-          id
-      )
-      // Remove old request
-      const oldRequest = await Request.query().patchAndFetchById(id, {
-        status_id: 4,
-      })
       const queue = await Queue.query()
         .findById(socket.data.queue_id)
-        .select('period_id')
-      const user = await User.query().findById(oldRequest.user_id).select('eid')
-      await Event.query().insert({
-        eid: user.eid,
-        status: 'Requeued',
-        period_id: queue.period_id,
-        presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
-      })
-      emitQueueRemove(socket.data.queue_id, id)
-      // Enqueue new request
-      const request = await Request.query().insertAndFetch({
-        user_id: oldRequest.user_id,
-        queue_id: socket.data.queue_id,
-        status_id: 1,
-      })
-      await Event.query().insert({
-        eid: user.eid,
-        status: 'Queued',
-        period_id: queue.period_id,
-      })
-      emitQueueUpdate(socket.data.queue_id, request.id)
-      callback(200)
+        .select('period_id', 'is_open')
+      if (queue.is_open == 1) {
+        logger.socket(
+          socket.data.user_eid +
+            ' - request:requeue - ' +
+            socket.data.queue_id +
+            ' - ' +
+            id
+        )
+        try {
+          // Remove old request
+          const oldRequest = await Request.query().patchAndFetchById(id, {
+            status_id: 4,
+          })
+          const queue = await Queue.query()
+            .findById(socket.data.queue_id)
+            .select('period_id')
+          const user = await User.query()
+            .findById(oldRequest.user_id)
+            .select('eid')
+          await Event.query().insert({
+            eid: user.eid,
+            status: 'Requeued',
+            period_id: queue.period_id,
+            presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+          })
+          emitQueueRemove(socket.data.queue_id, id)
+          // Enqueue new request
+          const request = await Request.query().insertAndFetch({
+            user_id: oldRequest.user_id,
+            queue_id: socket.data.queue_id,
+            status_id: 1,
+          })
+          await Event.query().insert({
+            eid: user.eid,
+            status: 'Queued',
+            period_id: queue.period_id,
+          })
+          emitQueueUpdate(socket.data.queue_id, request.id)
+          callback(200)
+        } catch (e) {
+          logger.socket(e.stack)
+          callback(500)
+        }
+        return
+      }
     }
     callback(403)
   }
