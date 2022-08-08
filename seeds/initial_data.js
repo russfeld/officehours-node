@@ -191,6 +191,8 @@ exports.seed = async function (knex) {
       id: '1',
       queue_name: 'Queue 3',
       is_open: '1',
+      created_at: now,
+      updated_at: now,
     },
   ])
 
