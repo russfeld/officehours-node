@@ -49,7 +49,7 @@ class Period extends Model {
         modelClass: Event,
         join: {
           from: 'periods.id',
-          to: 'event.period_id',
+          to: 'events.period_id',
         },
       },
 
