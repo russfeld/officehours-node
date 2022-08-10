@@ -4,6 +4,8 @@
  */
 exports.seed = async function (knex) {
   const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  var then = new Date(now)
+  then.setMinutes(then.getMinutes() - 5)
 
   // Users
   await knex('users').del()
@@ -191,14 +193,34 @@ exports.seed = async function (knex) {
       id: '1',
       queue_name: 'Queue 3',
       is_open: '1',
-      created_at: now,
+      created_at: then,
       updated_at: now,
     },
   ])
 
   // Presences
   await knex('presences').del()
+  await knex('presences').insert([
+    {
+      id: '1',
+      eid: 'test-student-3',
+      period_id: '1',
+      created_at: then,
+      updated_at: now,
+    },
+  ])
 
   // Events
   await knex('events').del()
+  await knex('events').insert([
+    {
+      id: '1',
+      eid: 'test-student-1',
+      status: 'Taken',
+      presence_id: null,
+      period_id: '1',
+      created_at: then,
+      updated_at: now,
+    },
+  ])
 }
