@@ -1,0 +1,1 @@
+import{_ as e}from"./index.acf31b8c.js";import{b as t,c as s,e as o}from"./vendor.0627cd51.js";const c={},n={class:"about"},r=o("h1",null,"About",-1),_=o("p",null,"More information coming soon!",-1),i=o("a",{href:"https://github.com/russfeld/officehours-node"},"View on GitHub",-1),a=[r,_,i];function d(f,u){return t(),s("div",n,a)}var m=e(c,[["render",d]]);export{m as default};
