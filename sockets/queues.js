@@ -47,6 +47,11 @@ const registerQueueHandlers = (io, socket) => {
             queue_id: socket.data.queue_id,
             status_id: 1,
           })
+          // TODO this is ineffecient and in multiple places
+          await Event.query().patch({}).whereNull('updated_at').andWhere({
+            eid: socket.data.user_eid,
+            period_id: queue.period_id,
+          })
           await Event.query().insert({
             eid: socket.data.user_eid,
             status: 'Queued',
@@ -82,6 +87,10 @@ const registerQueueHandlers = (io, socket) => {
           const user = await User.query()
             .findById(request.user_id)
             .select('eid')
+          await Event.query().patch({}).whereNull('updated_at').andWhere({
+            eid: user.eid,
+            period_id: queue.period_id,
+          })
           await Event.query().insert({
             eid: user.eid,
             status: 'Taken',
@@ -120,6 +129,10 @@ const registerQueueHandlers = (io, socket) => {
           const user = await User.query()
             .findById(request.user_id)
             .select('eid')
+          await Event.query().patch({}).whereNull('updated_at').andWhere({
+            eid: user.eid,
+            period_id: queue.period_id,
+          })
           await Event.query().insert({
             eid: user.eid,
             status: 'Deleted',
@@ -161,11 +174,16 @@ const registerQueueHandlers = (io, socket) => {
           const user = await User.query()
             .findById(request.user_id)
             .select('eid')
+
           await Event.query().insert({
             eid: user.eid,
             status: 'Finished',
             period_id: queue.period_id,
             presence_id: getPresence(socket.data.queue_id, socket.data.user_id),
+          })
+          await Event.query().patch({}).whereNull('updated_at').andWhere({
+            eid: user.eid,
+            period_id: queue.period_id,
           })
           emitQueueRemove(socket.data.queue_id, id)
           callback(200)
@@ -215,6 +233,10 @@ const registerQueueHandlers = (io, socket) => {
             user_id: oldRequest.user_id,
             queue_id: socket.data.queue_id,
             status_id: 1,
+          })
+          await Event.query().patch({}).whereNull('updated_at').andWhere({
+            eid: user.eid,
+            period_id: queue.period_id,
           })
           await Event.query().insert({
             eid: user.eid,
