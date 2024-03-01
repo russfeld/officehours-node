@@ -15,44 +15,44 @@
     "test-json": "mocha --require test/hooks.js --recursive --timeout 2000 --exit --reporter json > test-results.json"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.6.7",
     "compression": "^1.7.4",
     "connect-history-api-fallback": "^2.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "debug": "^4.3.4",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.4.5",
     "express": "4.18",
-    "express-mysql-session": "^2.1.8",
-    "express-session": "^1.17.2",
-    "helmet": "^5.1.0",
+    "express-mysql-session": "^3.0.0",
+    "express-session": "^1.18.0",
+    "helmet": "^7.1.0",
     "http-errors": "^2.0.0",
-    "jsonwebtoken": "^9.0.0",
-    "knex": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
-    "node-cas-authentication": "^0.0.15",
-    "objection": "^3.0.1",
+    "node-cas-authentication": "github:alt-cs-lab/cas-authentication",
+    "objection": "^3.1.4",
     "pug": "^3.0.2",
-    "socket.io": "^4.5.1",
-    "winston": "^3.8.0",
-    "ws": "^8.7.0",
-    "xml2js": "^0.4.23"
+    "socket.io": "^4.7.4",
+    "winston": "^3.11.0",
+    "ws": "^8.16.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "chai": "^4.3.6",
-    "chai-http": "^4.3.0",
-    "eslint": "^8.14.0",
-    "eslint-config-prettier": "^8.5.0",
-    "mocha": "^10.0.0",
-    "nodemon": "^2.0.18",
+    "chai": "^4.3.10",
+    "chai-http": "^4.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "mocha": "^10.3.0",
+    "nodemon": "^3.1.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.6.2",
-    "sinon": "^14.0.0",
-    "socket.io-client": "^4.5.1"
+    "prettier": "^3.2.5",
+    "sinon": "^17.0.1",
+    "socket.io-client": "^4.7.4"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.6",
-    "utf-8-validate": "^5.0.9"
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^6.0.3"
   }
 }
