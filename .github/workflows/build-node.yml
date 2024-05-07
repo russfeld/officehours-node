@@ -42,7 +42,7 @@ jobs:
       - name: 2- Set up Node LTS
         uses: actions/setup-node@v2
         with:
-          node-version: '16' # Version range or exact version of a Node version to use
+          node-version: '20' # Version range or exact version of a Node version to use
           cache: 'npm' # Cache NPM dependencies
 
       # Step 3 - Install Dependencies
