@@ -1,3 +1,3 @@
 [submodule "vue"]
 	path = vue
-	url = git@github.com:russfeld/officehours-vue.git
+	url = https://github.com/russfeld/officehours-vue.git
